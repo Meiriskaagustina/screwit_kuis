@@ -1,3 +1,11 @@
+export type QuizCategory =
+  | 'general'
+  | 'animals';
+
+export type QuizDifficulty =
+  | 'easy'
+  | 'medium';
+
 export interface RawQuestion {
   category: string;
   type: string;
@@ -12,5 +20,8 @@ export interface Question {
   question: string;
   correctAnswer: string;
   answers: string[];
-}
 
+  category: string;
+  difficulty: string;
+  type: string;
+}
