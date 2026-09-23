@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import type { Question } from '../api/quiz.types';
+import type { Question, QuizThemeConfig } from '../api/quiz.types';
+import { QUIZ_THEMES } from '../api/quiz.types';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface QuizCardProps {
@@ -11,7 +12,9 @@ interface QuizCardProps {
   onNextQuestion: () => void;
   onPreviousQuestion: () => void;
   onTick?: (elapsedSeconds: number) => void;
+  themeConfig?: QuizThemeConfig;
 }
+
 
 function formatClock(totalSeconds: number): string {
   const minutes = Math.floor(totalSeconds / 60);
@@ -51,6 +54,7 @@ export function QuizCard({
   onNextQuestion,
   onPreviousQuestion,
   onTick,
+  themeConfig = QUIZ_THEMES.blue,
 }: QuizCardProps) {
   const progressPercentage =
     totalQuestions > 0
@@ -102,11 +106,11 @@ export function QuizCard({
       }}
       style={{
         position: 'relative',
-        maxWidth: '640px',
+        maxWidth: '680px',
         width: '100%',
         boxSizing: 'border-box',
         margin: '28px auto 0',
-        padding: 'clamp(22px, 5vw, 34px)',
+        padding: 'clamp(24px, 5vw, 36px)',
         borderRadius: '30px',
 
         background:
@@ -122,12 +126,26 @@ export function QuizCard({
           '0 30px 70px rgba(17,24,39,0.32), inset 0 1px 0 rgba(255,255,255,0.15)',
 
         fontFamily:
-          "'Inter', system-ui, sans-serif",
+          "'Inter', system-ui, -apple-system, sans-serif",
 
         overflow: 'hidden',
       }}
     >
-      {/* GLOW */}
+      {/* GLOW - Dynamic Theme */}
+
+      <div
+        style={{
+          position: 'absolute',
+          width: '200px',
+          height: '200px',
+          borderRadius: '50%',
+          background:
+            `radial-gradient(circle, ${themeConfig.glow1}, transparent 70%)`,
+          top: '-100px',
+          right: '-80px',
+          pointerEvents: 'none',
+        }}
+      />
 
       <div
         style={{
@@ -136,23 +154,9 @@ export function QuizCard({
           height: '180px',
           borderRadius: '50%',
           background:
-            'radial-gradient(circle, rgba(236,72,153,0.22), transparent 70%)',
-          top: '-90px',
-          right: '-70px',
-          pointerEvents: 'none',
-        }}
-      />
-
-      <div
-        style={{
-          position: 'absolute',
-          width: '160px',
-          height: '160px',
-          borderRadius: '50%',
-          background:
-            'radial-gradient(circle, rgba(99,102,241,0.20), transparent 70%)',
-          bottom: '-80px',
-          left: '-70px',
+            `radial-gradient(circle, ${themeConfig.glow2}, transparent 70%)`,
+          bottom: '-90px',
+          left: '-80px',
           pointerEvents: 'none',
         }}
       />
@@ -171,14 +175,15 @@ export function QuizCard({
             justifyContent: 'space-between',
             alignItems: 'center',
             gap: '10px',
-            marginBottom: '14px',
+            marginBottom: '16px',
             flexWrap: 'wrap',
           }}
         >
           <div
             style={{
               display: 'flex',
-              gap: '7px',
+              gap: '8px',
+              alignItems: 'center',
               flexWrap: 'wrap',
             }}
           >
@@ -190,19 +195,19 @@ export function QuizCard({
                 alignItems: 'center',
                 gap: '6px',
 
-                padding: '7px 10px',
+                padding: '6px 12px',
                 borderRadius: '999px',
 
                 background:
-                  'rgba(255,255,255,0.09)',
+                  'rgba(255,255,255,0.08)',
 
                 border:
-                  '1px solid rgba(255,255,255,0.12)',
+                  '1px solid rgba(255,255,255,0.14)',
 
                 color:
-                  'rgba(255,255,255,0.72)',
+                  'rgba(255,255,255,0.85)',
 
-                fontSize: '10px',
+                fontSize: '11px',
                 fontWeight: 800,
               }}
             >
@@ -212,9 +217,9 @@ export function QuizCard({
                   height: '6px',
                   borderRadius: '50%',
                   background:
-                    'linear-gradient(135deg, #fbbf24, #fb7185)',
+                    themeConfig.primary,
                   boxShadow:
-                    '0 0 10px rgba(251,191,36,0.7)',
+                    `0 0 8px ${themeConfig.primary}`,
                 }}
               />
 
@@ -226,19 +231,19 @@ export function QuizCard({
 
             <span
               style={{
-                padding: '7px 10px',
+                padding: '6px 12px',
                 borderRadius: '999px',
 
                 background:
-                  'rgba(255,255,255,0.09)',
+                  themeConfig.selectedBg,
 
                 border:
-                  '1px solid rgba(255,255,255,0.12)',
+                  `1px solid ${themeConfig.selectedBorder}`,
 
                 color:
-                  'rgba(255,255,255,0.72)',
+                  themeConfig.accent,
 
-                fontSize: '10px',
+                fontSize: '11px',
                 fontWeight: 700,
               }}
             >
@@ -249,18 +254,18 @@ export function QuizCard({
 
             <span
               style={{
-                padding: '7px 10px',
+                padding: '6px 12px',
                 borderRadius: '999px',
 
                 background:
-  'rgba(111,163,168,0.16)',
+                  'rgba(255,255,255,0.08)',
 
-border:
-  '1px solid rgba(111,163,168,0.28)',
+                border:
+                  '1px solid rgba(255,255,255,0.14)',
 
-color: '#b9d9dc',
+                color: '#b9d9dc',
 
-                fontSize: '10px',
+                fontSize: '11px',
                 fontWeight: 800,
               }}
             >
@@ -277,19 +282,19 @@ color: '#b9d9dc',
 
           <div
             style={{
-              padding: '7px 10px',
+              padding: '6px 12px',
               borderRadius: '999px',
 
               background:
-                'rgba(255,255,255,0.09)',
+                'rgba(255,255,255,0.08)',
 
               border:
-                '1px solid rgba(255,255,255,0.12)',
+                '1px solid rgba(255,255,255,0.14)',
 
               color:
-                'rgba(255,255,255,0.75)',
+                'rgba(255,255,255,0.85)',
 
-              fontSize: '10px',
+              fontSize: '11px',
               fontWeight: 700,
 
               fontVariantNumeric:
@@ -306,14 +311,15 @@ color: '#b9d9dc',
           style={{
             display: 'flex',
             justifyContent: 'space-between',
+            alignItems: 'center',
             marginBottom: '8px',
           }}
         >
           <span
             style={{
               color:
-                'rgba(255,255,255,0.40)',
-              fontSize: '9px',
+                themeConfig.accent,
+              fontSize: '10px',
               fontWeight: 800,
               letterSpacing: '0.08em',
             }}
@@ -324,7 +330,7 @@ color: '#b9d9dc',
           <span
             style={{
               color: '#fde68a',
-              fontSize: '10px',
+              fontSize: '11px',
               fontWeight: 800,
             }}
           >
@@ -357,17 +363,18 @@ color: '#b9d9dc',
               width: `${progressPercentage}%`,
             }}
             transition={{
-              duration: 0.6,
+              duration: 0.5,
+              ease: 'easeOut',
             }}
             style={{
               height: '100%',
               borderRadius: '999px',
 
               background:
-  'linear-gradient(90deg, #5B8DEF, #6FA3A8)',
+                themeConfig.gradient,
 
-boxShadow:
-  '0 0 12px rgba(91,141,239,0.25)',
+              boxShadow:
+                `0 0 12px ${themeConfig.glow1}`,
             }}
           />
         </div>
@@ -384,7 +391,7 @@ boxShadow:
             }
             initial={{
               opacity: 0,
-              x: 25,
+              x: 20,
             }}
             animate={{
               opacity: 1,
@@ -392,51 +399,48 @@ boxShadow:
             }}
             exit={{
               opacity: 0,
-              x: -25,
+              x: -20,
             }}
             transition={{
-              duration: 0.35,
+              duration: 0.3,
             }}
           >
             <div
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '7px',
+                gap: '8px',
                 marginBottom: '10px',
               }}
             >
-              <span>
-                🧠
-              </span>
-
               <span
                 style={{
-color: '#9fc4e8',                  fontSize: '9px',
+                  color: themeConfig.accent,
+                  fontSize: '11px',
                   fontWeight: 800,
                   letterSpacing: '0.12em',
                 }}
               >
-                QUESTION
+                PERTANYAAN
               </span>
             </div>
 
             <h3
               style={{
                 margin:
-                  '0 0 26px',
+                  '0 0 28px',
 
                 color: '#ffffff',
 
                 fontSize:
-                  'clamp(19px, 4.5vw, 25px)',
+                  'clamp(19px, 4.5vw, 24px)',
 
                 fontWeight: 800,
 
-                lineHeight: 1.4,
+                lineHeight: 1.45,
 
                 letterSpacing:
-                  '-0.025em',
+                  '-0.02em',
               }}
             >
               {question.question}
@@ -449,7 +453,7 @@ color: '#9fc4e8',                  fontSize: '9px',
                 display: 'flex',
                 flexDirection:
                   'column',
-                gap: '11px',
+                gap: '12px',
               }}
             >
               {question.answers.map(
@@ -463,7 +467,7 @@ color: '#9fc4e8',                  fontSize: '9px',
                       key={index}
                       type="button"
                       whileHover={{
-                        scale: 1.015,
+                        scale: 1.012,
                         x: 4,
                       }}
                       whileTap={{
@@ -478,14 +482,14 @@ color: '#9fc4e8',                  fontSize: '9px',
                         display: 'flex',
                         alignItems:
                           'center',
-                        gap: '13px',
+                        gap: '14px',
 
                         width: '100%',
                         boxSizing:
                           'border-box',
 
                         padding:
-                          '14px 16px',
+                          '15px 18px',
 
                         textAlign:
                           'left',
@@ -494,14 +498,14 @@ color: '#9fc4e8',                  fontSize: '9px',
                           '18px',
 
                         border:
-  isSelected
-    ? '1.5px solid rgba(91,141,239,0.75)'
-    : '1px solid rgba(255,255,255,0.14)',
+                          isSelected
+                            ? `1.5px solid ${themeConfig.selectedBorder}`
+                            : '1px solid rgba(255,255,255,0.14)',
 
-background:
-  isSelected
-    ? 'rgba(91,141,239,0.18)'
-    : 'rgba(255,255,255,0.075)',
+                        background:
+                          isSelected
+                            ? themeConfig.selectedBg
+                            : 'rgba(255,255,255,0.075)',
 
                         color:
                           '#ffffff',
@@ -513,9 +517,12 @@ background:
                           'none',
 
                         boxShadow:
-  isSelected
-    ? '0 10px 25px rgba(91,141,239,0.18)'
-    : 'none',
+                          isSelected
+                            ? themeConfig.selectedShadow
+                            : 'none',
+
+                        transition:
+                          'border 0.2s ease, background 0.2s ease, box-shadow 0.2s ease',
                       }}
                     >
                       <span
@@ -531,25 +538,30 @@ background:
 
                           flexShrink: 0,
 
-                          width: '34px',
-                          height: '34px',
+                          width: '36px',
+                          height: '36px',
 
                           borderRadius:
-                            '11px',
+                            '12px',
 
                           background:
                             isSelected
-    ? 'linear-gradient(135deg, #5B8DEF, #6FA3A8)'
+                              ? themeConfig.gradient
                               : 'rgba(255,255,255,0.10)',
 
                           color:
                             '#ffffff',
 
                           fontSize:
-                            '12px',
+                            '13px',
 
                           fontWeight:
                             900,
+
+                          boxShadow:
+                            isSelected
+                              ? `0 4px 12px ${themeConfig.glow1}`
+                              : 'none',
                         }}
                       >
                         {labels[
@@ -563,7 +575,7 @@ background:
                           flex: 1,
 
                           fontSize:
-                            '14px',
+                            '14.5px',
 
                           lineHeight:
                             1.45,
@@ -572,6 +584,11 @@ background:
                             isSelected
                               ? 700
                               : 500,
+
+                          color:
+                            isSelected
+                              ? '#ffffff'
+                              : 'rgba(255,255,255,0.9)',
                         }}
                       >
                         {answer}
@@ -589,14 +606,14 @@ background:
                             justifyContent:
                               'center',
 
-                            width: '22px',
-                            height: '22px',
+                            width: '24px',
+                            height: '24px',
 
                             borderRadius:
                               '50%',
 
                             background:
-  'linear-gradient(135deg, #5B8DEF, #6FA3A8)',
+                              themeConfig.gradient,
                             color:
                               '#ffffff',
 
@@ -605,6 +622,9 @@ background:
 
                             fontWeight:
                               900,
+
+                            boxShadow:
+                              `0 2px 8px ${themeConfig.glow1}`,
                           }}
                         >
                           ✓
@@ -620,127 +640,130 @@ background:
 
         {/* NAVIGATION */}
 
-<div
-  style={{
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    gap: '12px',
-    marginTop: '28px',
-  }}
->
-  {/* BACK */}
-  <motion.button
-    type="button"
-    whileHover={
-      currentIndex > 0
-        ? {
-            scale: 1.03,
-            x: -2,
-          }
-        : {}
-    }
-    whileTap={
-      currentIndex > 0
-        ? {
-            scale: 0.97,
-          }
-        : {}
-    }
-    onClick={onPreviousQuestion}
-    disabled={currentIndex === 0}
-    style={{
-      minWidth: '110px',
-      padding: '13px 18px',
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: '14px',
+            marginTop: '32px',
+          }}
+        >
+          {/* BACK */}
+          <motion.button
+            type="button"
+            whileHover={
+              currentIndex > 0
+                ? {
+                    scale: 1.02,
+                    x: -2,
+                  }
+                : {}
+            }
+            whileTap={
+              currentIndex > 0
+                ? {
+                    scale: 0.97,
+                  }
+                : {}
+            }
+            onClick={onPreviousQuestion}
+            disabled={currentIndex === 0}
+            style={{
+              minWidth: '110px',
+              padding: '13px 20px',
 
-      border: '1px solid rgba(255,255,255,0.16)',
-      borderRadius: '15px',
+              border: '1px solid rgba(255,255,255,0.14)',
+              borderRadius: '16px',
 
-      background:
-        currentIndex > 0
-          ? 'rgba(255,255,255,0.09)'
-          : 'rgba(255,255,255,0.04)',
+              background:
+                currentIndex > 0
+                  ? 'rgba(255,255,255,0.08)'
+                  : 'rgba(255,255,255,0.03)',
 
-      color:
-        currentIndex > 0
-          ? 'rgba(255,255,255,0.85)'
-          : 'rgba(255,255,255,0.30)',
+              color:
+                currentIndex > 0
+                  ? 'rgba(255,255,255,0.85)'
+                  : 'rgba(255,255,255,0.25)',
 
-      fontSize: '13px',
-      fontWeight: 700,
+              fontSize: '13px',
+              fontWeight: 700,
 
-      cursor:
-        currentIndex > 0
-          ? 'pointer'
-          : 'not-allowed',
+              cursor:
+                currentIndex > 0
+                  ? 'pointer'
+                  : 'not-allowed',
 
-      opacity:
-        currentIndex > 0
-          ? 1
-          : 0.6,
+              opacity:
+                currentIndex > 0
+                  ? 1
+                  : 0.5,
 
-      transition: 'all 0.2s ease',
-    }}
-  >
-    ← Kembali
-  </motion.button>
+              transition: 'all 0.2s ease',
+            }}
+          >
+            ← Kembali
+          </motion.button>
 
-  {/* NEXT */}
-  <motion.button
-    type="button"
-    whileHover={
-      selectedAnswer
-        ? {
-            scale: 1.03,
-            y: -2,
-          }
-        : {}
-    }
-    whileTap={
-      selectedAnswer
-        ? {
-            scale: 0.97,
-          }
-        : {}
-    }
-    onClick={onNextQuestion}
-    disabled={!selectedAnswer}
-    style={{
-      minWidth: '130px',
-      padding: '14px 22px',
+          {/* NEXT */}
+          <motion.button
+            type="button"
+            whileHover={
+              selectedAnswer
+                ? {
+                    scale: 1.02,
+                    y: -2,
+                    boxShadow: `0 12px 28px ${themeConfig.glow1}`,
+                  }
+                : {}
+            }
+            whileTap={
+              selectedAnswer
+                ? {
+                    scale: 0.97,
+                  }
+                : {}
+            }
+            onClick={onNextQuestion}
+            disabled={!selectedAnswer}
+            style={{
+              minWidth: '135px',
+              padding: '14px 24px',
 
-      border: 'none',
-      borderRadius: '15px',
+              border: 'none',
+              borderRadius: '16px',
 
-      background: selectedAnswer
-        ? 'linear-gradient(135deg, #5b8def, #6fa3a8)'
-        : 'rgba(255,255,255,0.08)',
+              background: selectedAnswer
+                ? themeConfig.gradient
+                : 'rgba(255,255,255,0.08)',
 
-      color: '#ffffff',
+              color: '#ffffff',
 
-      fontSize: '14px',
-      fontWeight: 800,
+              fontSize: '14px',
+              fontWeight: 900,
 
-      cursor: selectedAnswer
-        ? 'pointer'
-        : 'not-allowed',
+              cursor: selectedAnswer
+                ? 'pointer'
+                : 'not-allowed',
 
-      opacity: selectedAnswer
-        ? 1
-        : 0.5,
+              opacity: selectedAnswer
+                ? 1
+                : 0.45,
 
-      boxShadow: selectedAnswer
-        ? '0 8px 22px rgba(91,141,239,0.22)'
-        : 'none',
-    }}
-  >
-    {currentIndex === totalQuestions - 1
-      ? 'Selesai ✓'
-      : 'Lanjut →'}
-  </motion.button>
-</div>
-          
+              boxShadow: selectedAnswer
+                ? `0 10px 25px ${themeConfig.glow1}`
+                : 'none',
+
+              transition: 'all 0.2s ease',
+            }}
+          >
+            {currentIndex === totalQuestions - 1
+              ? 'Selesai ✓'
+              : 'Lanjut →'}
+          </motion.button>
+        </div>
       </div>
     </motion.div>
   );
 }
+

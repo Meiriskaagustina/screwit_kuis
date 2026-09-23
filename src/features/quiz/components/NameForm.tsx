@@ -5,7 +5,9 @@ import { motion } from 'framer-motion';
 import type {
   QuizCategory,
   QuizDifficulty,
-} from '../api/quiz.api';
+  QuizThemeConfig,
+} from '../api/quiz.types';
+import { QUIZ_THEMES } from '../api/quiz.types';
 
 interface NameFormProps {
   onStartQuiz: (
@@ -13,7 +15,9 @@ interface NameFormProps {
     category: QuizCategory,
     difficulty: QuizDifficulty,
   ) => void;
+  themeConfig?: QuizThemeConfig;
 }
+
 
 const categoryOptions: {
   value: QuizCategory;
@@ -26,14 +30,14 @@ const categoryOptions: {
     value: 'general',
     label: 'General Knowledge',
     icon: '🧠',
-    description: 'Pengetahuan umum sehari-hari',
+    description: 'Pengetahuan umum & wawasan luas',
     difficulties: ['easy', 'medium'],
   },
   {
     value: 'animals',
     label: 'Animals',
     icon: '🐾',
-    description: 'Dunia hewan dan satwa',
+    description: 'Dunia hewan & fauna unik',
     difficulties: ['medium'],
   },
 ];
@@ -54,11 +58,11 @@ const difficultyOptions: {
     value: 'medium',
     label: 'Medium',
     icon: '🔥',
-    description: 'Sedikit lebih menantang',
+    description: 'Tantangan menengah',
   },
 ];
 
-export function NameForm({ onStartQuiz }: NameFormProps) {
+export function NameForm({ onStartQuiz, themeConfig = QUIZ_THEMES.blue }: NameFormProps) {
   const [name, setName] = useState('');
 
   const [category, setCategory] =
@@ -116,12 +120,6 @@ export function NameForm({ onStartQuiz }: NameFormProps) {
         alignItems: 'center',
         justifyContent: 'center',
 
-        background:
-          'radial-gradient(circle at 10% 10%, rgba(91,141,239,0.18), transparent 30%),' +
-          'radial-gradient(circle at 90% 5%, rgba(111,163,168,0.16), transparent 32%),' +
-          'radial-gradient(circle at 50% 100%, rgba(143,179,217,0.12), transparent 38%),' +
-          'linear-gradient(135deg, #172033 0%, #1d2939 50%, #243447 100%)',
-
         fontFamily:
           "'Inter', system-ui, -apple-system, sans-serif",
       }}
@@ -129,8 +127,8 @@ export function NameForm({ onStartQuiz }: NameFormProps) {
       <motion.div
         initial={{
           opacity: 0,
-          y: 30,
-          scale: 0.95,
+          y: 25,
+          scale: 0.96,
         }}
         animate={{
           opacity: 1,
@@ -143,10 +141,10 @@ export function NameForm({ onStartQuiz }: NameFormProps) {
         }}
         style={{
           position: 'relative',
-          maxWidth: '500px',
+          maxWidth: '520px',
           width: '100%',
           boxSizing: 'border-box',
-          padding: 'clamp(24px, 5vw, 36px)',
+          padding: 'clamp(26px, 5vw, 38px)',
           borderRadius: '30px',
 
           background:
@@ -164,19 +162,19 @@ export function NameForm({ onStartQuiz }: NameFormProps) {
           overflow: 'hidden',
         }}
       >
-        {/* Decorative glow */}
+        {/* Decorative calm glow */}
 
         <div
           style={{
             position: 'absolute',
-            width: '180px',
-            height: '180px',
+            width: '200px',
+            height: '200px',
             borderRadius: '50%',
-            top: '-90px',
-            right: '-80px',
+            top: '-100px',
+            right: '-90px',
 
             background:
-              'radial-gradient(circle, rgba(91,141,239,0.20), transparent 70%)',
+              `radial-gradient(circle, ${themeConfig.glow1}, transparent 70%)`,
 
             pointerEvents: 'none',
           }}
@@ -192,7 +190,7 @@ export function NameForm({ onStartQuiz }: NameFormProps) {
             left: '-80px',
 
             background:
-              'radial-gradient(circle, rgba(111,163,168,0.18), transparent 70%)',
+              `radial-gradient(circle, ${themeConfig.glow2}, transparent 70%)`,
 
             pointerEvents: 'none',
           }}
@@ -204,12 +202,12 @@ export function NameForm({ onStartQuiz }: NameFormProps) {
             zIndex: 2,
           }}
         >
-          {/* LOGO */}
+          {/* LOGO BADGE */}
 
           <motion.div
             initial={{
               scale: 0,
-              rotate: -20,
+              rotate: -15,
             }}
             animate={{
               scale: 1,
@@ -217,27 +215,26 @@ export function NameForm({ onStartQuiz }: NameFormProps) {
             }}
             transition={{
               type: 'spring',
-              stiffness: 260,
-              damping: 20,
-              delay: 0.15,
+              stiffness: 240,
+              damping: 18,
+              delay: 0.1,
             }}
             style={{
-              width: '68px',
-              height: '68px',
-              margin: '0 auto 18px',
-              borderRadius: '22px',
+              width: '72px',
+              height: '72px',
+              margin: '0 auto 20px',
+              borderRadius: '24px',
 
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
 
-              background:
-                'linear-gradient(135deg, #5B8DEF 0%, #6FA3A8 100%)',
+              background: themeConfig.gradient,
 
-              fontSize: '30px',
+              fontSize: '32px',
 
               boxShadow:
-                '0 15px 30px rgba(91,141,239,0.22)',
+                `0 15px 35px ${themeConfig.glow1}, inset 0 1px 0 rgba(255,255,255,0.3)`,
             }}
           >
             🎯
@@ -248,9 +245,22 @@ export function NameForm({ onStartQuiz }: NameFormProps) {
           <div
             style={{
               textAlign: 'center',
-              marginBottom: '28px',
+              marginBottom: '30px',
             }}
           >
+            <div
+              style={{
+                fontSize: '11px',
+                fontWeight: 800,
+                letterSpacing: '0.14em',
+                color: themeConfig.accent,
+                marginBottom: '6px',
+                textTransform: 'uppercase',
+              }}
+            >
+              Interactive Quiz Platform
+            </div>
+
             <h1
               style={{
                 margin: 0,
@@ -266,13 +276,12 @@ export function NameForm({ onStartQuiz }: NameFormProps) {
             <p
               style={{
                 margin: '8px 0 0',
-                color: 'rgba(255,255,255,0.58)',
-                fontSize: '13px',
+                color: 'rgba(255,255,255,0.65)',
+                fontSize: '13.5px',
                 lineHeight: 1.5,
               }}
             >
-              Uji wawasanmu. Pilih kategori,
-              pilih tingkat kesulitan, lalu gas! 🚀
+              Uji wawasanmu. Pilih kategori & tingkat kesulitan, lalu mulai tantangan! 🚀
             </p>
           </div>
 
@@ -291,7 +300,7 @@ export function NameForm({ onStartQuiz }: NameFormProps) {
                 style={{
                   display: 'block',
                   marginBottom: '8px',
-                  color: 'rgba(255,255,255,0.75)',
+                  color: themeConfig.accent,
                   fontSize: '11px',
                   fontWeight: 800,
                   letterSpacing: '0.08em',
@@ -315,7 +324,7 @@ export function NameForm({ onStartQuiz }: NameFormProps) {
                   width: '100%',
                   boxSizing: 'border-box',
                   padding: '14px 16px',
-                  borderRadius: '15px',
+                  borderRadius: '16px',
 
                   background:
                     'rgba(255,255,255,0.075)',
@@ -349,7 +358,7 @@ export function NameForm({ onStartQuiz }: NameFormProps) {
               >
                 <label
                   style={{
-                    color: 'rgba(255,255,255,0.75)',
+                    color: themeConfig.accent,
                     fontSize: '11px',
                     fontWeight: 800,
                     letterSpacing: '0.08em',
@@ -360,8 +369,9 @@ export function NameForm({ onStartQuiz }: NameFormProps) {
 
                 <span
                   style={{
-                    color: 'rgba(255,255,255,0.35)',
+                    color: 'rgba(255,255,255,0.40)',
                     fontSize: '10px',
+                    fontWeight: 600,
                   }}
                 >
                   Pilih topik
@@ -373,7 +383,7 @@ export function NameForm({ onStartQuiz }: NameFormProps) {
                   display: 'grid',
                   gridTemplateColumns:
                     'repeat(2, minmax(0, 1fr))',
-                  gap: '10px',
+                  gap: '12px',
                 }}
               >
                 {categoryOptions.map((item) => {
@@ -392,29 +402,31 @@ export function NameForm({ onStartQuiz }: NameFormProps) {
                         )
                       }
                       style={{
-                        padding: '15px 12px',
-                        borderRadius: '17px',
+                        padding: '16px 14px',
+                        borderRadius: '18px',
 
                         border: isSelected
-                          ? '1.5px solid rgba(91,141,239,0.75)'
-                          : '1px solid rgba(255,255,255,0.13)',
+                          ? `1.5px solid ${themeConfig.selectedBorder}`
+                          : '1px solid rgba(255,255,255,0.14)',
 
                         background: isSelected
-                          ? 'rgba(91,141,239,0.16)'
-                          : 'rgba(255,255,255,0.06)',
+                          ? themeConfig.selectedBg
+                          : 'rgba(255,255,255,0.075)',
 
                         color: '#ffffff',
                         cursor: 'pointer',
                         textAlign: 'left',
 
                         boxShadow: isSelected
-                          ? '0 10px 25px rgba(91,141,239,0.16)'
+                          ? themeConfig.selectedShadow
                           : 'none',
+
+                        transition: 'border 0.2s ease, background 0.2s ease',
                       }}
                     >
                       <div
                         style={{
-                          fontSize: '22px',
+                          fontSize: '24px',
                           marginBottom: '8px',
                         }}
                       >
@@ -423,9 +435,10 @@ export function NameForm({ onStartQuiz }: NameFormProps) {
 
                       <div
                         style={{
-                          fontSize: '12px',
+                          fontSize: '13px',
                           fontWeight: 800,
-                          marginBottom: '3px',
+                          marginBottom: '4px',
+                          color: isSelected ? '#ffffff' : 'rgba(255,255,255,0.9)',
                         }}
                       >
                         {item.label}
@@ -433,10 +446,11 @@ export function NameForm({ onStartQuiz }: NameFormProps) {
 
                       <div
                         style={{
-                          fontSize: '9px',
+                          fontSize: '10px',
                           lineHeight: 1.4,
-                          color:
-                            'rgba(255,255,255,0.42)',
+                          color: isSelected
+                            ? 'rgba(255,255,255,0.75)'
+                            : 'rgba(255,255,255,0.45)',
                         }}
                       >
                         {item.description}
@@ -454,7 +468,7 @@ export function NameForm({ onStartQuiz }: NameFormProps) {
                 style={{
                   display: 'block',
                   marginBottom: '10px',
-                  color: 'rgba(255,255,255,0.75)',
+                  color: themeConfig.accent,
                   fontSize: '11px',
                   fontWeight: 800,
                   letterSpacing: '0.08em',
@@ -468,7 +482,7 @@ export function NameForm({ onStartQuiz }: NameFormProps) {
                   display: 'grid',
                   gridTemplateColumns:
                     'repeat(2, minmax(0, 1fr))',
-                  gap: '10px',
+                  gap: '12px',
                 }}
               >
                 {difficultyOptions.map((item) => {
@@ -507,12 +521,12 @@ export function NameForm({ onStartQuiz }: NameFormProps) {
                         borderRadius: '16px',
 
                         border: isSelected
-                          ? '1.5px solid rgba(91,141,239,0.75)'
-                          : '1px solid rgba(255,255,255,0.13)',
+                          ? `1.5px solid ${themeConfig.selectedBorder}`
+                          : '1px solid rgba(255,255,255,0.14)',
 
                         background: isSelected
-                          ? 'rgba(91,141,239,0.16)'
-                          : 'rgba(255,255,255,0.06)',
+                          ? themeConfig.selectedBg
+                          : 'rgba(255,255,255,0.075)',
 
                         color: isAvailable
                           ? '#ffffff'
@@ -524,9 +538,13 @@ export function NameForm({ onStartQuiz }: NameFormProps) {
 
                         opacity: isAvailable
                           ? 1
-                          : 0.5,
+                          : 0.45,
 
                         textAlign: 'left',
+
+                        boxShadow: isSelected
+                          ? themeConfig.selectedShadow
+                          : 'none',
                       }}
                     >
                       <div
@@ -549,10 +567,11 @@ export function NameForm({ onStartQuiz }: NameFormProps) {
 
                       <div
                         style={{
-                          fontSize: '9px',
+                          fontSize: '10px',
                           marginTop: '3px',
-                          color:
-                            'rgba(255,255,255,0.42)',
+                          color: isAvailable
+                            ? 'rgba(255,255,255,0.5)'
+                            : 'rgba(255,255,255,0.22)',
                         }}
                       >
                         {isAvailable
@@ -565,7 +584,7 @@ export function NameForm({ onStartQuiz }: NameFormProps) {
               </div>
             </div>
 
-            {/* START */}
+            {/* START BUTTON */}
 
             <motion.button
               type="submit"
@@ -573,29 +592,30 @@ export function NameForm({ onStartQuiz }: NameFormProps) {
                 scale: 1.02,
                 y: -2,
                 boxShadow:
-                  '0 15px 35px rgba(91,141,239,0.28)',
+                  `0 15px 35px ${themeConfig.glow1}`,
               }}
               whileTap={{
                 scale: 0.97,
               }}
               style={{
-                marginTop: '2px',
-                padding: '15px',
+                marginTop: '6px',
+                padding: '16px',
                 border: 'none',
                 borderRadius: '16px',
 
-                background:
-                  'linear-gradient(135deg, #5B8DEF 0%, #6FA3A8 100%)',
+                background: themeConfig.gradient,
 
                 color: '#ffffff',
 
-                fontSize: '14px',
+                fontSize: '15px',
                 fontWeight: 900,
 
                 cursor: 'pointer',
 
                 boxShadow:
-                  '0 10px 25px rgba(91,141,239,0.22)',
+                  `0 10px 25px ${themeConfig.glow1}`,
+
+                transition: 'transform 0.2s ease, box-shadow 0.2s ease',
               }}
             >
               🚀 Mulai Permainan
@@ -606,4 +626,6 @@ export function NameForm({ onStartQuiz }: NameFormProps) {
     </div>
   );
 }
+
+
 
