@@ -2,7 +2,7 @@ import axios from 'axios';
 import type { Question, RawQuestion } from './quiz.types'; // Tambahkan kata 'type'
 
 export const fetchQuestions = async (amount: number = 10): Promise<Question[]> => {
-  const response = await axios.get(`https://opentdb.com/api.php?amount=${amount}&encode=url3986`);
+  const response = await axios.get(`https://opentdb.com/api.php?amount=10&category=27&difficulty=easy&type=multiple&encode=url3986`);
 
   return response.data.results.map((q: RawQuestion, index: number) => {
     const decodedQuestion = decodeURIComponent(q.question);
