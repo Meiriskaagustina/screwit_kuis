@@ -3,6 +3,7 @@ import { fetchQuestions } from './features/quiz/api/quiz.api';
 import type { Question } from './features/quiz/api/quiz.types';
 import { NameForm } from './features/quiz/components/NameForm';
 import { QuizCard } from './features/quiz/components/QuizCard';
+import { ResultView } from './features/quiz/components/ResultView';
 
 export default function App() {
   const [playerName, setPlayerName] = useState<string>('');
@@ -10,6 +11,7 @@ export default function App() {
   const [loading, setLoading] = useState<boolean>(false);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [userAnswers, setUserAnswers] = useState<Record<number, string>>({});
+  const [isQuizFinished, setIsQuizFinished] = useState<boolean>(false);
 
   const handleStartQuiz = (name: string) => {
     setPlayerName(name);
@@ -32,17 +34,24 @@ export default function App() {
     if (currentIndex < questions.length - 1) {
       setCurrentIndex((prev) => prev + 1);
     } else {
-      alert(`Kuis Selesai! Kamu telah menjawab semua ${questions.length} soal.`);
-      // Nanti di Issue #4 akan diarahkan ke ResultView
+      setIsQuizFinished(true); // Tandai kuis selesai
     }
   };
 
-  // 1. Jika belum isi nama
+  const handleRestart = () => {
+    setPlayerName('');
+    setQuestions([]);
+    setCurrentIndex(0);
+    setUserAnswers({});
+    setIsQuizFinished(false);
+  };
+
+  // 1. Tampilan awal jika belum isi nama
   if (!playerName) {
     return <NameForm onStartQuiz={handleStartQuiz} />;
   }
 
-  // 2. Jika sedang loading ambil soal
+  // 2. Tampilan loading saat fetch data
   if (loading) {
     return (
       <p style={{ textAlign: 'center', marginTop: '50px', fontFamily: 'sans-serif' }}>
@@ -51,7 +60,21 @@ export default function App() {
     );
   }
 
-  // 3. Tampilan Kuis dengan QuizCard
+  // 3. Tampilan Hasil Kuis (ResultView)
+  if (isQuizFinished) {
+    return (
+      <div style={{ backgroundColor: '#f3f4f6', minHeight: '100vh', padding: '20px' }}>
+        <ResultView
+          playerName={playerName}
+          questions={questions}
+          userAnswers={userAnswers}
+          onRestart={handleRestart}
+        />
+      </div>
+    );
+  }
+
+  // 4. Tampilan Soal Kuis (QuizCard)
   if (questions.length > 0) {
     const currentQuestion = questions[currentIndex];
     const selectedAnswer = userAnswers[currentIndex] || null;
