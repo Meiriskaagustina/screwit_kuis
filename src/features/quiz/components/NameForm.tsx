@@ -1,4 +1,5 @@
-```import { useState, FormEvent } from 'react';
+import { useState } from 'react';
+import type { FormEvent } from 'react'; // Pakai 'type' untuk import tipe data
 
 interface NameFormProps {
   onStartQuiz: (playerName: string) => void;
@@ -7,7 +8,8 @@ interface NameFormProps {
 export function NameForm({ onStartQuiz }: NameFormProps) {
   const [name, setName] = useState('');
 
-  const handleSubmit = (e: FormEvent) => {
+  // Perbarui penulisan event-nya di sini
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (name.trim()) {
       onStartQuiz(name.trim());
@@ -52,5 +54,3 @@ export function NameForm({ onStartQuiz }: NameFormProps) {
     </div>
   );
 }
-
-```

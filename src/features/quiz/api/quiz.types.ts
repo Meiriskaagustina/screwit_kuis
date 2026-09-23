@@ -13,3 +13,4 @@ export interface Question {
   correctAnswer: string;
   answers: string[];
 }
+
