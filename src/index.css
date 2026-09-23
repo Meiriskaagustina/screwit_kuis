@@ -109,3 +109,32 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.3); }
+  50% { box-shadow: 0 0 35px rgba(168, 85, 247, 0.5); }
+}
+
+.animate-card {
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.glow-effect {
+  animation: pulseGlow 4s infinite ease-in-out;
+}
+
+.quiz-name-input::placeholder {
+  color: rgba(255, 255, 255, 0.72);
+  opacity: 1;
+}
+
+.quiz-name-input:focus {
+  border-color: rgba(251, 191, 36, 0.7);
+  background: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.08);
+}
