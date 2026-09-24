@@ -15,7 +15,6 @@ interface QuizCardProps {
   themeConfig?: QuizThemeConfig;
 }
 
-
 function formatClock(totalSeconds: number): string {
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
@@ -25,9 +24,7 @@ function formatClock(totalSeconds: number): string {
     .padStart(2, '0')}`;
 }
 
-function formatDifficulty(
-  difficulty: string,
-): string {
+function formatDifficulty(difficulty: string): string {
   if (difficulty === 'easy') return 'Easy';
   if (difficulty === 'medium') return 'Medium';
   if (difficulty === 'hard') return 'Hard';
@@ -35,9 +32,7 @@ function formatDifficulty(
   return difficulty;
 }
 
-function getDifficultyIcon(
-  difficulty: string,
-): string {
+function getDifficultyIcon(difficulty: string): string {
   if (difficulty === 'easy') return '🌱';
   if (difficulty === 'medium') return '🔥';
   if (difficulty === 'hard') return '💀';
@@ -61,27 +56,33 @@ export function QuizCard({
       ? ((currentIndex + 1) / totalQuestions) * 100
       : 0;
 
-  const startTimeRef =
-    useRef<number>(Date.now());
-
-  const [elapsedSeconds, setElapsedSeconds] =
-    useState(0);
+  // Store the quiz start time without calling Date.now()
+  // directly inside useRef during render.
+  const startTimeRef = useRef<number | null>(null);
 
   useEffect(() => {
-    const intervalId =
-      window.setInterval(() => {
-        const seconds = Math.floor(
-          (Date.now() -
-            startTimeRef.current) /
-            1000,
-        );
+    if (startTimeRef.current === null) {
+      startTimeRef.current = Date.now();
+    }
+  }, []);
 
-        setElapsedSeconds(seconds);
-        onTick?.(seconds);
-      }, 1000);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
-    return () =>
-      window.clearInterval(intervalId);
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      if (startTimeRef.current === null) {
+        return;
+      }
+
+      const seconds = Math.floor(
+        (Date.now() - startTimeRef.current) / 1000,
+      );
+
+      setElapsedSeconds(seconds);
+      onTick?.(seconds);
+    }, 1000);
+
+    return () => window.clearInterval(intervalId);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -119,14 +120,12 @@ export function QuizCard({
         backdropFilter: 'blur(24px)',
         WebkitBackdropFilter: 'blur(24px)',
 
-        border:
-          '1px solid rgba(255,255,255,0.20)',
+        border: '1px solid rgba(255,255,255,0.20)',
 
         boxShadow:
           '0 30px 70px rgba(17,24,39,0.32), inset 0 1px 0 rgba(255,255,255,0.15)',
 
-        fontFamily:
-          "'Inter', system-ui, -apple-system, sans-serif",
+        fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
 
         overflow: 'hidden',
       }}
@@ -139,8 +138,7 @@ export function QuizCard({
           width: '200px',
           height: '200px',
           borderRadius: '50%',
-          background:
-            `radial-gradient(circle, ${themeConfig.glow1}, transparent 70%)`,
+          background: `radial-gradient(circle, ${themeConfig.glow1}, transparent 70%)`,
           top: '-100px',
           right: '-80px',
           pointerEvents: 'none',
@@ -153,8 +151,7 @@ export function QuizCard({
           width: '180px',
           height: '180px',
           borderRadius: '50%',
-          background:
-            `radial-gradient(circle, ${themeConfig.glow2}, transparent 70%)`,
+          background: `radial-gradient(circle, ${themeConfig.glow2}, transparent 70%)`,
           bottom: '-90px',
           left: '-80px',
           pointerEvents: 'none',
@@ -198,14 +195,11 @@ export function QuizCard({
                 padding: '6px 12px',
                 borderRadius: '999px',
 
-                background:
-                  'rgba(255,255,255,0.08)',
+                background: 'rgba(255,255,255,0.08)',
 
-                border:
-                  '1px solid rgba(255,255,255,0.14)',
+                border: '1px solid rgba(255,255,255,0.14)',
 
-                color:
-                  'rgba(255,255,255,0.85)',
+                color: 'rgba(255,255,255,0.85)',
 
                 fontSize: '11px',
                 fontWeight: 800,
@@ -216,15 +210,12 @@ export function QuizCard({
                   width: '6px',
                   height: '6px',
                   borderRadius: '50%',
-                  background:
-                    themeConfig.primary,
-                  boxShadow:
-                    `0 0 8px ${themeConfig.primary}`,
+                  background: themeConfig.primary,
+                  boxShadow: `0 0 8px ${themeConfig.primary}`,
                 }}
               />
 
-              SOAL {currentIndex + 1}/
-              {totalQuestions}
+              SOAL {currentIndex + 1}/{totalQuestions}
             </span>
 
             {/* Category */}
@@ -234,14 +225,11 @@ export function QuizCard({
                 padding: '6px 12px',
                 borderRadius: '999px',
 
-                background:
-                  themeConfig.selectedBg,
+                background: themeConfig.selectedBg,
 
-                border:
-                  `1px solid ${themeConfig.selectedBorder}`,
+                border: `1px solid ${themeConfig.selectedBorder}`,
 
-                color:
-                  themeConfig.accent,
+                color: themeConfig.accent,
 
                 fontSize: '11px',
                 fontWeight: 700,
@@ -257,11 +245,9 @@ export function QuizCard({
                 padding: '6px 12px',
                 borderRadius: '999px',
 
-                background:
-                  'rgba(255,255,255,0.08)',
+                background: 'rgba(255,255,255,0.08)',
 
-                border:
-                  '1px solid rgba(255,255,255,0.14)',
+                border: '1px solid rgba(255,255,255,0.14)',
 
                 color: '#b9d9dc',
 
@@ -269,12 +255,8 @@ export function QuizCard({
                 fontWeight: 800,
               }}
             >
-              {getDifficultyIcon(
-                question.difficulty,
-              )}{' '}
-              {formatDifficulty(
-                question.difficulty,
-              )}
+              {getDifficultyIcon(question.difficulty)}{' '}
+              {formatDifficulty(question.difficulty)}
             </span>
           </div>
 
@@ -285,20 +267,16 @@ export function QuizCard({
               padding: '6px 12px',
               borderRadius: '999px',
 
-              background:
-                'rgba(255,255,255,0.08)',
+              background: 'rgba(255,255,255,0.08)',
 
-              border:
-                '1px solid rgba(255,255,255,0.14)',
+              border: '1px solid rgba(255,255,255,0.14)',
 
-              color:
-                'rgba(255,255,255,0.85)',
+              color: 'rgba(255,255,255,0.85)',
 
               fontSize: '11px',
               fontWeight: 700,
 
-              fontVariantNumeric:
-                'tabular-nums',
+              fontVariantNumeric: 'tabular-nums',
             }}
           >
             ⏱️ {formatClock(elapsedSeconds)}
@@ -317,8 +295,7 @@ export function QuizCard({
         >
           <span
             style={{
-              color:
-                themeConfig.accent,
+              color: themeConfig.accent,
               fontSize: '10px',
               fontWeight: 800,
               letterSpacing: '0.08em',
@@ -334,10 +311,7 @@ export function QuizCard({
               fontWeight: 800,
             }}
           >
-            {Math.round(
-              progressPercentage,
-            )}
-            %
+            {Math.round(progressPercentage)}%
           </span>
         </div>
 
@@ -347,8 +321,7 @@ export function QuizCard({
             height: '8px',
             borderRadius: '999px',
 
-            background:
-              'rgba(255,255,255,0.10)',
+            background: 'rgba(255,255,255,0.10)',
 
             overflow: 'hidden',
 
@@ -370,25 +343,18 @@ export function QuizCard({
               height: '100%',
               borderRadius: '999px',
 
-              background:
-                themeConfig.gradient,
+              background: themeConfig.gradient,
 
-              boxShadow:
-                `0 0 12px ${themeConfig.glow1}`,
+              boxShadow: `0 0 12px ${themeConfig.glow1}`,
             }}
           />
         </div>
 
         {/* QUESTION */}
 
-        <AnimatePresence
-          mode="wait"
-        >
+        <AnimatePresence mode="wait">
           <motion.div
-            key={
-              question.id ||
-              currentIndex
-            }
+            key={question.id || currentIndex}
             initial={{
               opacity: 0,
               x: 20,
@@ -427,20 +393,17 @@ export function QuizCard({
 
             <h3
               style={{
-                margin:
-                  '0 0 28px',
+                margin: '0 0 28px',
 
                 color: '#ffffff',
 
-                fontSize:
-                  'clamp(19px, 4.5vw, 24px)',
+                fontSize: 'clamp(19px, 4.5vw, 24px)',
 
                 fontWeight: 800,
 
                 lineHeight: 1.45,
 
-                letterSpacing:
-                  '-0.02em',
+                letterSpacing: '-0.02em',
               }}
             >
               {question.question}
@@ -451,189 +414,143 @@ export function QuizCard({
             <div
               style={{
                 display: 'flex',
-                flexDirection:
-                  'column',
+                flexDirection: 'column',
                 gap: '12px',
               }}
             >
-              {question.answers.map(
-                (answer, index) => {
-                  const isSelected =
-                    selectedAnswer ===
-                    answer;
+              {question.answers.map((answer, index) => {
+                const isSelected = selectedAnswer === answer;
 
-                  return (
-                    <motion.button
-                      key={index}
-                      type="button"
-                      whileHover={{
-                        scale: 1.012,
-                        x: 4,
-                      }}
-                      whileTap={{
-                        scale: 0.985,
-                      }}
-                      onClick={() =>
-                        onSelectAnswer(
-                          answer,
-                        )
-                      }
+                return (
+                  <motion.button
+                    key={index}
+                    type="button"
+                    whileHover={{
+                      scale: 1.012,
+                      x: 4,
+                    }}
+                    whileTap={{
+                      scale: 0.985,
+                    }}
+                    onClick={() => onSelectAnswer(answer)}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '14px',
+
+                      width: '100%',
+                      boxSizing: 'border-box',
+
+                      padding: '15px 18px',
+
+                      textAlign: 'left',
+
+                      borderRadius: '18px',
+
+                      border: isSelected
+                        ? `1.5px solid ${themeConfig.selectedBorder}`
+                        : '1px solid rgba(255,255,255,0.14)',
+
+                      background: isSelected
+                        ? themeConfig.selectedBg
+                        : 'rgba(255,255,255,0.075)',
+
+                      color: '#ffffff',
+
+                      cursor: 'pointer',
+
+                      outline: 'none',
+
+                      boxShadow: isSelected
+                        ? themeConfig.selectedShadow
+                        : 'none',
+
+                      transition:
+                        'border 0.2s ease, background 0.2s ease, box-shadow 0.2s ease',
+                    }}
+                  >
+                    <span
                       style={{
-                        display: 'flex',
-                        alignItems:
-                          'center',
-                        gap: '14px',
+                        display: 'inline-flex',
 
-                        width: '100%',
-                        boxSizing:
-                          'border-box',
+                        alignItems: 'center',
 
-                        padding:
-                          '15px 18px',
+                        justifyContent: 'center',
 
-                        textAlign:
-                          'left',
+                        flexShrink: 0,
 
-                        borderRadius:
-                          '18px',
+                        width: '36px',
+                        height: '36px',
 
-                        border:
-                          isSelected
-                            ? `1.5px solid ${themeConfig.selectedBorder}`
-                            : '1px solid rgba(255,255,255,0.14)',
+                        borderRadius: '12px',
 
-                        background:
-                          isSelected
-                            ? themeConfig.selectedBg
-                            : 'rgba(255,255,255,0.075)',
+                        background: isSelected
+                          ? themeConfig.gradient
+                          : 'rgba(255,255,255,0.10)',
 
-                        color:
-                          '#ffffff',
+                        color: '#ffffff',
 
-                        cursor:
-                          'pointer',
+                        fontSize: '13px',
 
-                        outline:
-                          'none',
+                        fontWeight: 900,
 
-                        boxShadow:
-                          isSelected
-                            ? themeConfig.selectedShadow
-                            : 'none',
-
-                        transition:
-                          'border 0.2s ease, background 0.2s ease, box-shadow 0.2s ease',
+                        boxShadow: isSelected
+                          ? `0 4px 12px ${themeConfig.glow1}`
+                          : 'none',
                       }}
                     >
+                      {labels[index] ?? index + 1}
+                    </span>
+
+                    <span
+                      style={{
+                        flex: 1,
+
+                        fontSize: '14.5px',
+
+                        lineHeight: 1.45,
+
+                        fontWeight: isSelected ? 700 : 500,
+
+                        color: isSelected
+                          ? '#ffffff'
+                          : 'rgba(255,255,255,0.9)',
+                      }}
+                    >
+                      {answer}
+                    </span>
+
+                    {isSelected && (
                       <span
                         style={{
-                          display:
-                            'inline-flex',
+                          display: 'flex',
 
-                          alignItems:
-                            'center',
+                          alignItems: 'center',
 
-                          justifyContent:
-                            'center',
+                          justifyContent: 'center',
 
-                          flexShrink: 0,
+                          width: '24px',
+                          height: '24px',
 
-                          width: '36px',
-                          height: '36px',
+                          borderRadius: '50%',
 
-                          borderRadius:
-                            '12px',
+                          background: themeConfig.gradient,
 
-                          background:
-                            isSelected
-                              ? themeConfig.gradient
-                              : 'rgba(255,255,255,0.10)',
+                          color: '#ffffff',
 
-                          color:
-                            '#ffffff',
+                          fontSize: '12px',
 
-                          fontSize:
-                            '13px',
+                          fontWeight: 900,
 
-                          fontWeight:
-                            900,
-
-                          boxShadow:
-                            isSelected
-                              ? `0 4px 12px ${themeConfig.glow1}`
-                              : 'none',
+                          boxShadow: `0 2px 8px ${themeConfig.glow1}`,
                         }}
                       >
-                        {labels[
-                          index
-                        ] ??
-                          index + 1}
+                        ✓
                       </span>
-
-                      <span
-                        style={{
-                          flex: 1,
-
-                          fontSize:
-                            '14.5px',
-
-                          lineHeight:
-                            1.45,
-
-                          fontWeight:
-                            isSelected
-                              ? 700
-                              : 500,
-
-                          color:
-                            isSelected
-                              ? '#ffffff'
-                              : 'rgba(255,255,255,0.9)',
-                        }}
-                      >
-                        {answer}
-                      </span>
-
-                      {isSelected && (
-                        <span
-                          style={{
-                            display:
-                              'flex',
-
-                            alignItems:
-                              'center',
-
-                            justifyContent:
-                              'center',
-
-                            width: '24px',
-                            height: '24px',
-
-                            borderRadius:
-                              '50%',
-
-                            background:
-                              themeConfig.gradient,
-                            color:
-                              '#ffffff',
-
-                            fontSize:
-                              '12px',
-
-                            fontWeight:
-                              900,
-
-                            boxShadow:
-                              `0 2px 8px ${themeConfig.glow1}`,
-                          }}
-                        >
-                          ✓
-                        </span>
-                      )}
-                    </motion.button>
-                  );
-                },
-              )}
+                    )}
+                  </motion.button>
+                );
+              })}
             </div>
           </motion.div>
         </AnimatePresence>
@@ -650,6 +567,7 @@ export function QuizCard({
           }}
         >
           {/* BACK */}
+
           <motion.button
             type="button"
             whileHover={
@@ -690,14 +608,9 @@ export function QuizCard({
               fontWeight: 700,
 
               cursor:
-                currentIndex > 0
-                  ? 'pointer'
-                  : 'not-allowed',
+                currentIndex > 0 ? 'pointer' : 'not-allowed',
 
-              opacity:
-                currentIndex > 0
-                  ? 1
-                  : 0.5,
+              opacity: currentIndex > 0 ? 1 : 0.5,
 
               transition: 'all 0.2s ease',
             }}
@@ -706,6 +619,7 @@ export function QuizCard({
           </motion.button>
 
           {/* NEXT */}
+
           <motion.button
             type="button"
             whileHover={
@@ -746,9 +660,7 @@ export function QuizCard({
                 ? 'pointer'
                 : 'not-allowed',
 
-              opacity: selectedAnswer
-                ? 1
-                : 0.45,
+              opacity: selectedAnswer ? 1 : 0.45,
 
               boxShadow: selectedAnswer
                 ? `0 10px 25px ${themeConfig.glow1}`
@@ -766,4 +678,3 @@ export function QuizCard({
     </motion.div>
   );
 }
-
