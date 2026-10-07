@@ -26,7 +26,7 @@ export interface Question {
   type: string;
 }
 
-export type QuizThemeId = 'blue' | 'emerald' | 'amber';
+export type QuizThemeId = 'purple' | 'pink' | 'yellow' | 'blue' | 'emerald' | 'amber';
 
 export interface QuizThemeConfig {
   id: QuizThemeId;
@@ -35,6 +35,15 @@ export interface QuizThemeConfig {
   primary: string;
   secondary: string;
   accent: string;
+  highlight: string;
+  canvasBg: string;
+  surface: string;
+  contrastText: string;
+  badgeBg: string;
+  cardBg: string;
+  border: string;
+  shadow: string;
+  shadowLg: string;
   gradient: string;
   glow1: string;
   glow2: string;
@@ -44,62 +53,87 @@ export interface QuizThemeConfig {
   bgGradient: string;
 }
 
+const themePurple: QuizThemeConfig = {
+  id: 'purple',
+  name: 'ScrewIt Purple',
+  icon: '⚡',
+  primary: '#8B5CF6',
+  secondary: '#EC4899',
+  accent: '#EC4899',
+  highlight: '#FACC15',
+  canvasBg: '#EDE9FE',
+  surface: '#F5F3FF',
+  contrastText: '#FFFFFF',
+  badgeBg: '#FACC15',
+  cardBg: '#F5F3FF',
+  border: '#000000',
+  shadow: '4px 4px 0px #000000',
+  shadowLg: '6px 6px 0px #000000',
+  gradient: '#8B5CF6',
+  glow1: '#8B5CF6',
+  glow2: '#EC4899',
+  selectedBg: '#DDD6FE',
+  selectedBorder: '#000000',
+  selectedShadow: '4px 4px 0px #000000',
+  bgGradient: '#EDE9FE',
+};
+
+const themePink: QuizThemeConfig = {
+  id: 'pink',
+  name: 'Hot Pink',
+  icon: '💖',
+  primary: '#EC4899',
+  secondary: '#8B5CF6',
+  accent: '#8B5CF6',
+  highlight: '#FACC15',
+  canvasBg: '#FCE7F3',
+  surface: '#FFF1F2',
+  contrastText: '#FFFFFF',
+  badgeBg: '#FACC15',
+  cardBg: '#FFF1F2',
+  border: '#000000',
+  shadow: '4px 4px 0px #000000',
+  shadowLg: '6px 6px 0px #000000',
+  gradient: '#EC4899',
+  glow1: '#EC4899',
+  glow2: '#FACC15',
+  selectedBg: '#FBCFE8',
+  selectedBorder: '#000000',
+  selectedShadow: '4px 4px 0px #000000',
+  bgGradient: '#FCE7F3',
+};
+
+const themeYellow: QuizThemeConfig = {
+  id: 'yellow',
+  name: 'Electric Yellow',
+  icon: '⚡',
+  primary: '#FACC15',
+  secondary: '#EC4899',
+  accent: '#8B5CF6',
+  highlight: '#EC4899',
+  canvasBg: '#FEF3C7',
+  surface: '#FFFBEB',
+  contrastText: '#000000',
+  badgeBg: '#8B5CF6',
+  cardBg: '#FFFBEB',
+  border: '#000000',
+  shadow: '4px 4px 0px #000000',
+  shadowLg: '6px 6px 0px #000000',
+  gradient: '#FACC15',
+  glow1: '#FACC15',
+  glow2: '#EC4899',
+  selectedBg: '#FDE68A',
+  selectedBorder: '#000000',
+  selectedShadow: '4px 4px 0px #000000',
+  bgGradient: '#FEF3C7',
+};
+
 export const QUIZ_THEMES: Record<QuizThemeId, QuizThemeConfig> = {
-  blue: {
-    id: 'blue',
-    name: 'Ocean Blue',
-    icon: '🌊',
-    primary: '#5B8DEF',
-    secondary: '#6FA3A8',
-    accent: '#9fc4e8',
-    gradient: 'linear-gradient(135deg, #5B8DEF 0%, #6FA3A8 100%)',
-    glow1: 'rgba(91,141,239,0.18)',
-    glow2: 'rgba(111,163,168,0.16)',
-    selectedBg: 'rgba(91,141,239,0.18)',
-    selectedBorder: 'rgba(91,141,239,0.75)',
-    selectedShadow: '0 10px 25px rgba(91,141,239,0.18)',
-    bgGradient:
-      'radial-gradient(circle at 10% 10%, rgba(91,141,239,0.18), transparent 30%),' +
-      'radial-gradient(circle at 90% 5%, rgba(111,163,168,0.16), transparent 32%),' +
-      'radial-gradient(circle at 50% 100%, rgba(143,179,217,0.12), transparent 38%),' +
-      'linear-gradient(135deg, #172033 0%, #1d2939 50%, #243447 100%)',
-  },
-  emerald: {
-    id: 'emerald',
-    name: 'Mint Emerald',
-    icon: '🌿',
-    primary: '#10B981',
-    secondary: '#14B8A6',
-    accent: '#6EE7B7',
-    gradient: 'linear-gradient(135deg, #10B981 0%, #14B8A6 100%)',
-    glow1: 'rgba(16,185,129,0.18)',
-    glow2: 'rgba(20,184,166,0.16)',
-    selectedBg: 'rgba(16,185,129,0.18)',
-    selectedBorder: 'rgba(16,185,129,0.75)',
-    selectedShadow: '0 10px 25px rgba(16,185,129,0.18)',
-    bgGradient:
-      'radial-gradient(circle at 10% 10%, rgba(16,185,129,0.18), transparent 30%),' +
-      'radial-gradient(circle at 90% 5%, rgba(20,184,166,0.16), transparent 32%),' +
-      'radial-gradient(circle at 50% 100%, rgba(52,211,153,0.12), transparent 38%),' +
-      'linear-gradient(135deg, #132723 0%, #1c3630 50%, #23453e 100%)',
-  },
-  amber: {
-    id: 'amber',
-    name: 'Sunset Amber',
-    icon: '🌅',
-    primary: '#F59E0B',
-    secondary: '#F97316',
-    accent: '#FDE68A',
-    gradient: 'linear-gradient(135deg, #F59E0B 0%, #F97316 100%)',
-    glow1: 'rgba(245,158,11,0.18)',
-    glow2: 'rgba(249,115,22,0.16)',
-    selectedBg: 'rgba(245,158,11,0.18)',
-    selectedBorder: 'rgba(245,158,11,0.75)',
-    selectedShadow: '0 10px 25px rgba(245,158,11,0.18)',
-    bgGradient:
-      'radial-gradient(circle at 10% 10%, rgba(245,158,11,0.18), transparent 30%),' +
-      'radial-gradient(circle at 90% 5%, rgba(249,115,22,0.16), transparent 32%),' +
-      'radial-gradient(circle at 50% 100%, rgba(251,191,36,0.12), transparent 38%),' +
-      'linear-gradient(135deg, #2b1f17 0%, #36281d 50%, #453224 100%)',
-  },
-};
+  purple: themePurple,
+  pink: themePink,
+  yellow: themeYellow,
+  // Backward compatibility aliases
+  blue: themePurple,
+  emerald: themePink,
+  amber: themeYellow,
+};
