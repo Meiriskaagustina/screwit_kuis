@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import toast, { Toaster } from 'react-hot-toast';
 import { fetchQuestions } from './features/quiz/api/quiz.api';
 import type {
   Question,
   QuizCategory,
   QuizDifficulty,
+  QuizThemeConfig,
   QuizThemeId,
 } from './features/quiz/api/quiz.types';
 import { QUIZ_THEMES } from './features/quiz/api/quiz.types';
@@ -13,6 +15,41 @@ import { NameForm } from './features/quiz/components/NameForm';
 import { QuizCard } from './features/quiz/components/QuizCard';
 import { ResultView } from './features/quiz/components/ResultView';
 
+function QuizToaster({ themeConfig }: { themeConfig: QuizThemeConfig }) {
+  return (
+    <Toaster
+      position="top-center"
+      gutter={10}
+      toastOptions={{
+        duration: 2500,
+        style: {
+          background: themeConfig.surface,
+          color: '#000000',
+          border: '3px solid #000000',
+          borderRadius: '12px',
+          padding: '12px 18px',
+          fontSize: '14px',
+          fontWeight: 800,
+          fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+          boxShadow: '5px 5px 0px #000000',
+        },
+        success: {
+          iconTheme: {
+            primary: '#000000',
+            secondary: themeConfig.primary,
+          },
+        },
+        error: {
+          iconTheme: {
+            primary: '#000000',
+            secondary: '#EF4444',
+          },
+        },
+      }}
+    />
+  );
+}
+
 function ThemeSwitcher({
   currentTheme,
   onThemeChange,
@@ -20,7 +57,8 @@ function ThemeSwitcher({
   currentTheme: QuizThemeId;
   onThemeChange: (themeId: QuizThemeId) => void;
 }) {
-  const themesList = Object.values(QUIZ_THEMES);
+  const availableThemeKeys: QuizThemeId[] = ['purple', 'pink', 'yellow'];
+  const themesList = availableThemeKeys.map((key) => QUIZ_THEMES[key]);
 
   return (
     <div
@@ -33,59 +71,69 @@ function ThemeSwitcher({
         alignItems: 'center',
         gap: '6px',
         padding: '6px 10px',
-        borderRadius: '999px',
-        background: 'rgba(255, 255, 255, 0.12)',
-        border: '1px solid rgba(255, 255, 255, 0.20)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)',
+        borderRadius: '12px',
+        background: '#FFFFFF',
+        border: '3px solid #000000',
+        boxShadow: '4px 4px 0px #000000',
+        fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
       }}
     >
       <span
         style={{
-          fontSize: '10px',
-          fontWeight: 800,
-          color: 'rgba(255, 255, 255, 0.65)',
+          fontSize: '11px',
+          fontWeight: 900,
+          color: '#000000',
           marginRight: '2px',
-          paddingLeft: '4px',
+          paddingLeft: '2px',
           letterSpacing: '0.06em',
           textTransform: 'uppercase',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '4px',
         }}
       >
-        TEMA:
+        <span>🎨</span> THEME:
       </span>
       {themesList.map((t) => {
         const isActive = t.id === currentTheme;
+        const textColor = t.contrastText;
+
         return (
           <motion.button
             key={t.id}
             type="button"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => onThemeChange(t.id)}
-            title={t.name}
+            whileHover={{ y: -2 }}
+            whileTap={{ y: 2 }}
+            onClick={() => {
+              onThemeChange(t.id);
+              toast(`Tema aktif: ${t.name}`, {
+                id: 'theme-toast',
+                icon: t.icon,
+                duration: 1400,
+              });
+            }}
+            title={`Ganti tema ke ${t.name}`}
             style={{
               display: 'inline-flex',
               alignItems: 'center',
               gap: '4px',
-              padding: '5px 10px',
-              borderRadius: '999px',
-              border: isActive
-                ? `1.5px solid ${t.primary}`
-                : '1px solid rgba(255, 255, 255, 0.14)',
-              background: isActive
-                ? t.selectedBg
-                : 'rgba(255, 255, 255, 0.05)',
-              color: '#ffffff',
+              padding: '6px 12px',
+              borderRadius: '8px',
+              border: isActive ? '2.5px solid #000000' : '2px solid #000000',
+              background: isActive ? t.primary : '#FFFFFF',
+              color: isActive ? textColor : '#000000',
               fontSize: '11px',
-              fontWeight: isActive ? 800 : 600,
+              fontWeight: 900,
+              letterSpacing: '0.04em',
+              textTransform: 'uppercase',
               cursor: 'pointer',
-              boxShadow: isActive ? `0 0 12px ${t.glow1}` : 'none',
-              transition: 'all 0.2s ease',
+              boxShadow: isActive ? '3px 3px 0px #000000' : 'none',
+              transform: isActive ? 'translate(-1px, -1px)' : 'none',
+              transition: 'background 0.15s ease, box-shadow 0.15s ease',
             }}
           >
             <span>{t.icon}</span>
-            <span>{t.name}</span>
+            <span>{t.id.toUpperCase()}</span>
           </motion.button>
         );
       })}
@@ -95,10 +143,10 @@ function ThemeSwitcher({
 
 export default function App() {
   // =========================================================
-  // THEME
+  // THEME (Default to brand purple)
   // =========================================================
 
-  const [currentThemeId, setCurrentThemeId] = useState<QuizThemeId>('blue');
+  const [currentThemeId, setCurrentThemeId] = useState<QuizThemeId>('purple');
   const currentThemeConfig = QUIZ_THEMES[currentThemeId];
 
   // =========================================================
@@ -111,40 +159,25 @@ export default function App() {
   // QUIZ SETTINGS
   // =========================================================
 
-  const [category, setCategory] =
-    useState<QuizCategory>('general');
-
-  const [difficulty, setDifficulty] =
-    useState<QuizDifficulty>('easy');
+  const [category, setCategory] = useState<QuizCategory>('general');
+  const [difficulty, setDifficulty] = useState<QuizDifficulty>('easy');
 
   // =========================================================
   // QUESTIONS
   // =========================================================
 
-  const [questions, setQuestions] =
-    useState<Question[]>([]);
-
-  const [loading, setLoading] =
-    useState<boolean>(false);
-
-  const [error, setError] =
-    useState<string>('');
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>('');
 
   // =========================================================
   // QUIZ PROGRESS
   // =========================================================
 
-  const [currentIndex, setCurrentIndex] =
-    useState<number>(0);
-
-  const [userAnswers, setUserAnswers] =
-    useState<Record<number, string>>({});
-
-  const [isQuizFinished, setIsQuizFinished] =
-    useState<boolean>(false);
-
-  const [elapsedSeconds, setElapsedSeconds] =
-    useState<number>(0);
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [userAnswers, setUserAnswers] = useState<Record<number, string>>({});
+  const [isQuizFinished, setIsQuizFinished] = useState<boolean>(false);
+  const [elapsedSeconds, setElapsedSeconds] = useState<number>(0);
 
   // =========================================================
   // START QUIZ
@@ -156,7 +189,6 @@ export default function App() {
     selectedDifficulty: QuizDifficulty,
   ) => {
     setPlayerName(name);
-
     setCategory(selectedCategory);
     setDifficulty(selectedDifficulty);
 
@@ -168,6 +200,10 @@ export default function App() {
     setIsQuizFinished(false);
     setElapsedSeconds(0);
 
+    const loadToastId = toast.loading('Memuat soal kuis...', {
+      id: 'quiz-loading',
+    });
+
     try {
       const data = await fetchQuestions({
         amount: 10,
@@ -176,14 +212,18 @@ export default function App() {
       });
 
       setQuestions(data);
+      toast.success(`Selamat datang, ${name}! Kuis siap dimulai 🎯`, {
+        id: loadToastId,
+        duration: 2200,
+      });
     } catch (err) {
       console.error('Gagal mengambil soal:', err);
 
-      setError(
-        'Gagal mengambil soal. Silakan coba lagi.',
-      );
-
+      setError('Gagal mengambil soal. Silakan coba lagi.');
       setPlayerName('');
+      toast.error('Gagal mengambil soal. Silakan coba lagi.', {
+        id: loadToastId,
+      });
     } finally {
       setLoading(false);
     }
@@ -193,13 +233,17 @@ export default function App() {
   // SELECT ANSWER
   // =========================================================
 
-  const handleSelectAnswer = (
-    answer: string,
-  ) => {
+  const handleSelectAnswer = (answer: string) => {
     setUserAnswers((prev) => ({
       ...prev,
       [currentIndex]: answer,
     }));
+
+    toast.success('Jawaban dipilih!', {
+      id: 'answer-toast',
+      icon: '✅',
+      duration: 1200,
+    });
   };
 
   // =========================================================
@@ -209,14 +253,28 @@ export default function App() {
   const handleNextQuestion = () => {
     if (currentIndex < questions.length - 1) {
       setCurrentIndex((prev) => prev + 1);
+      toast(`Soal ${currentIndex + 2} dari ${questions.length}`, {
+        id: 'nav-toast',
+        icon: '📝',
+        duration: 1000,
+      });
     } else {
       setIsQuizFinished(true);
+      toast.success('Semua soal terjawab! Menghitung hasil... 🎉', {
+        id: 'finish-toast',
+        duration: 2500,
+      });
     }
   };
 
   const handlePreviousQuestion = () => {
     if (currentIndex > 0) {
       setCurrentIndex((prev) => prev - 1);
+      toast(`Kembali ke soal ${currentIndex}`, {
+        id: 'nav-toast',
+        icon: '↩️',
+        duration: 1000,
+      });
     }
   };
 
@@ -227,42 +285,47 @@ export default function App() {
   const handleRestart = () => {
     setPlayerName('');
     setQuestions([]);
-
     setCategory('general');
     setDifficulty('easy');
 
     setCurrentIndex(0);
     setUserAnswers({});
-
     setIsQuizFinished(false);
     setElapsedSeconds(0);
 
     setError('');
+    toast('Kuis direset. Ayo coba lagi!', {
+      id: 'restart-toast',
+      icon: '🔄',
+      duration: 2000,
+    });
   };
 
   // =========================================================
-  // PAGE STYLE
+  // PAGE STYLE (DYNAMIC CANVAS THEME COLOR)
   // =========================================================
 
   const pageStyle: React.CSSProperties = {
     minHeight: '100vh',
     width: '100%',
     boxSizing: 'border-box',
-
-    background: currentThemeConfig.bgGradient,
-
-    padding: '24px 18px',
-
-    transition: 'background 0.5s ease',
+    backgroundColor: currentThemeConfig.canvasBg,
+    backgroundImage: 'radial-gradient(#000000 1.25px, transparent 1.25px)',
+    backgroundSize: '24px 24px',
+    padding: '36px 16px 60px',
+    color: '#000000',
+    overflowX: 'hidden',
+    transition: 'background-color 0.25s ease',
   };
 
   // =========================================================
-  // NAME FORM
+  // NAME FORM SCREEN
   // =========================================================
 
   if (!playerName) {
     return (
       <div style={pageStyle}>
+        <QuizToaster themeConfig={currentThemeConfig} />
         <ThemeSwitcher
           currentTheme={currentThemeId}
           onThemeChange={setCurrentThemeId}
@@ -274,23 +337,30 @@ export default function App() {
         />
 
         {error && (
-          <p
+          <div
             style={{
-              color: '#f89898',
+              maxWidth: '500px',
+              margin: '20px auto 0',
+              padding: '12px 18px',
+              borderRadius: '12px',
+              background: '#FEE2E2',
+              border: '3px solid #000000',
+              boxShadow: '4px 4px 0px #000000',
+              color: '#B91C1C',
               textAlign: 'center',
-              marginTop: '15px',
-              fontWeight: 600,
+              fontWeight: 800,
+              fontSize: '14px',
             }}
           >
-            {error}
-          </p>
+            ⚠️ {error}
+          </div>
         )}
       </div>
     );
   }
 
   // =========================================================
-  // LOADING
+  // LOADING SCREEN
   // =========================================================
 
   if (loading) {
@@ -304,178 +374,120 @@ export default function App() {
           overflow: 'hidden',
         }}
       >
+        <QuizToaster themeConfig={currentThemeConfig} />
         <ThemeSwitcher
           currentTheme={currentThemeId}
           onThemeChange={setCurrentThemeId}
         />
 
         <motion.div
-          initial={{ opacity: 0, scale: 0.9, y: 20 }}
+          initial={{ opacity: 0, scale: 0.95, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{
-            duration: 0.4,
-            ease: 'easeOut',
-          }}
+          transition={{ duration: 0.35, ease: 'easeOut' }}
           style={{
             position: 'relative',
-            width: 'min(420px, 90%)',
-            padding: '40px 32px',
-            borderRadius: '28px',
-            background:
-              'linear-gradient(145deg, rgba(255,255,255,0.17), rgba(255,255,255,0.07))',
-            border: '1px solid rgba(255,255,255,0.20)',
-            backdropFilter: 'blur(24px)',
-            WebkitBackdropFilter: 'blur(24px)',
-            color: '#ffffff',
+            width: 'min(460px, 92%)',
+            padding: '36px 28px',
+            borderRadius: '20px',
+            background: currentThemeConfig.surface,
+            border: '4px solid #000000',
+            boxShadow: '10px 10px 0px #000000',
+            color: '#000000',
             textAlign: 'center',
-            boxShadow: '0 30px 70px rgba(17,24,39,0.32), inset 0 1px 0 rgba(255,255,255,0.15)',
-            overflow: 'hidden',
+            fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
           }}
         >
-          {/* Floating calm glow */}
-          <motion.div
-            animate={{
-              scale: [1, 1.2, 1],
-              opacity: [0.2, 0.4, 0.2],
-            }}
-            transition={{
-              duration: 2.5,
-              repeat: Infinity,
-              ease: 'easeInOut',
-            }}
+          {/* Logo / Icon Badge */}
+          <div
             style={{
-              position: 'absolute',
-              width: '140px',
-              height: '140px',
-              borderRadius: '50%',
-              background: currentThemeConfig.glow1,
-              filter: 'blur(30px)',
-              top: '-40px',
-              left: '-40px',
-              pointerEvents: 'none',
-            }}
-          />
-
-          {/* Icon */}
-          <motion.div
-            animate={{
-              rotate: [0, 10, -10, 360],
-              y: [0, -6, 0],
-            }}
-            transition={{
-              duration: 2.2,
-              repeat: Infinity,
-              ease: 'easeInOut',
-            }}
-            style={{
-              fontSize: '52px',
-              marginBottom: '18px',
               display: 'inline-block',
+              padding: '10px 16px',
+              borderRadius: '14px',
+              background: '#FFFFFF',
+              border: '3px solid #000000',
+              boxShadow: '4px 4px 0px #000000',
+              marginBottom: '16px',
             }}
           >
-            🎯
-          </motion.div>
-
-          {/* Title */}
-          <motion.h2
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              delay: 0.15,
-              duration: 0.3,
-            }}
-            style={{
-              margin: 0,
-              fontSize: '22px',
-              fontWeight: 800,
-              letterSpacing: '-0.02em',
-              color: '#ffffff',
-            }}
-          >
-            Menyiapkan Quiz
-            <motion.span
-              animate={{ opacity: [0, 1, 0] }}
-              transition={{
-                duration: 1.2,
-                repeat: Infinity,
-              }}
+            <motion.div
+              animate={{ rotate: [0, 10, -10, 0] }}
+              transition={{ repeat: Infinity, duration: 1.5 }}
+              style={{ fontSize: '38px' }}
             >
-              ...
-            </motion.span>
-          </motion.h2>
+              🎯
+            </motion.div>
+          </div>
 
-          {/* Description */}
-          <motion.p
-            animate={{
-              opacity: [0.6, 0.95, 0.6],
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: 'easeInOut',
-            }}
+          <h2
             style={{
-              margin: '8px 0 24px',
-              color: currentThemeConfig.accent,
-              fontSize: '13px',
-              fontWeight: 500,
+              margin: '0 0 6px',
+              fontSize: '24px',
+              fontWeight: 900,
+              letterSpacing: '-0.02em',
+              textTransform: 'uppercase',
             }}
           >
-            Mengambil soal dari OpenTDB
-          </motion.p>
+            Menyiapkan Quiz...
+          </h2>
 
-          {/* Loading bar */}
+          <p
+            style={{
+              margin: '0 0 20px',
+              color: '#4B5563',
+              fontSize: '14px',
+              fontWeight: 700,
+            }}
+          >
+            Mengambil soal trivia dari OpenTDB API
+          </p>
+
+          {/* Neo-brutalist loading track */}
           <div
             style={{
               width: '100%',
-              height: '6px',
+              height: '16px',
               borderRadius: '999px',
-              background: 'rgba(255,255,255,0.10)',
+              background: '#FFFFFF',
+              border: '3px solid #000000',
+              boxShadow: '3px 3px 0px #000000',
               overflow: 'hidden',
             }}
           >
             <motion.div
-              animate={{
-                x: ['-100%', '100%'],
-              }}
-              transition={{
-                duration: 1.5,
-                repeat: Infinity,
-                ease: 'easeInOut',
-              }}
+              animate={{ x: ['-100%', '100%'] }}
+              transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
               style={{
-                width: '45%',
+                width: '50%',
                 height: '100%',
-                borderRadius: '999px',
-                background: currentThemeConfig.gradient,
-                boxShadow: `0 0 10px ${currentThemeConfig.glow1}`,
+                background: currentThemeConfig.primary,
+                borderRight: '2px solid #000',
               }}
             />
           </div>
 
-          {/* Small status */}
-          <motion.div
-            animate={{ opacity: [0.5, 1, 0.5] }}
-            transition={{
-              duration: 1.5,
-              repeat: Infinity,
-            }}
+          <div
             style={{
               marginTop: '16px',
+              display: 'inline-block',
+              padding: '4px 12px',
+              borderRadius: '6px',
+              background: currentThemeConfig.highlight,
+              border: '1.5px solid #000000',
               fontSize: '11px',
-              color: 'rgba(255,255,255,0.55)',
-              fontWeight: 600,
+              fontWeight: 900,
+              textTransform: 'uppercase',
+              color: '#000000',
             }}
           >
-            Hampir siap...
-          </motion.div>
+            ⚡ Hampir Siap...
+          </div>
         </motion.div>
       </div>
     );
   }
 
   // =========================================================
-  // ERROR
+  // ERROR SCREEN
   // =========================================================
 
   if (error) {
@@ -488,6 +500,7 @@ export default function App() {
           alignItems: 'center',
         }}
       >
+        <QuizToaster themeConfig={currentThemeConfig} />
         <ThemeSwitcher
           currentTheme={currentThemeId}
           onThemeChange={setCurrentThemeId}
@@ -497,46 +510,42 @@ export default function App() {
           initial={{ opacity: 0, scale: 0.95, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           style={{
-            maxWidth: '450px',
-            width: '100%',
-            padding: '36px 30px',
-            borderRadius: '28px',
-            background:
-              'linear-gradient(145deg, rgba(255,255,255,0.17), rgba(255,255,255,0.07))',
-            border: '1px solid rgba(255,255,255,0.20)',
-            backdropFilter: 'blur(24px)',
-            WebkitBackdropFilter: 'blur(24px)',
+            maxWidth: '460px',
+            width: '92%',
+            padding: '36px 28px',
+            borderRadius: '20px',
+            background: '#FFFFFF',
+            border: '4px solid #000000',
+            boxShadow: '10px 10px 0px #000000',
             textAlign: 'center',
-            color: '#ffffff',
-            boxShadow: '0 30px 70px rgba(17,24,39,0.32)',
+            color: '#000000',
+            fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
           }}
         >
-          <div
-            style={{
-              fontSize: '48px',
-              marginBottom: '14px',
-            }}
-          >
-            😵
-          </div>
+          <div style={{ fontSize: '48px', marginBottom: '12px' }}>😵</div>
 
           <h2
             style={{
-              margin: 0,
+              margin: '0 0 8px',
               fontSize: '24px',
-              fontWeight: 800,
-              color: '#ffffff',
+              fontWeight: 900,
+              textTransform: 'uppercase',
             }}
           >
-            Terjadi Kesalahan
+            Terjadi Kesalahan!
           </h2>
 
           <p
             style={{
-              color: '#f89898',
-              margin: '10px 0 24px',
-              fontSize: '13.5px',
+              color: '#B91C1C',
+              margin: '0 0 24px',
+              fontSize: '14px',
+              fontWeight: 700,
               lineHeight: 1.5,
+              background: '#FEE2E2',
+              padding: '10px 14px',
+              borderRadius: '10px',
+              border: '2px solid #000000',
             }}
           >
             {error}
@@ -544,22 +553,24 @@ export default function App() {
 
           <motion.button
             type="button"
-            whileHover={{ scale: 1.02, y: -2 }}
-            whileTap={{ scale: 0.97 }}
+            whileHover={{ y: -2, boxShadow: '7px 7px 0px #000000' }}
+            whileTap={{ y: 2, boxShadow: '2px 2px 0px #000000' }}
             onClick={handleRestart}
             style={{
-              border: 'none',
-              borderRadius: '16px',
-              padding: '14px 24px',
-              background: currentThemeConfig.gradient,
-              color: '#ffffff',
-              fontSize: '14px',
-              fontWeight: 800,
+              border: '3.5px solid #000000',
+              borderRadius: '14px',
+              padding: '14px 28px',
+              background: currentThemeConfig.primary,
+              color: currentThemeConfig.contrastText,
+              fontSize: '15px',
+              fontWeight: 900,
               cursor: 'pointer',
-              boxShadow: `0 10px 25px ${currentThemeConfig.glow1}`,
+              boxShadow: '5px 5px 0px #000000',
+              textTransform: 'uppercase',
+              letterSpacing: '0.04em',
             }}
           >
-            🔄 Coba Lagi
+            🔄 COBA LAGI
           </motion.button>
         </motion.div>
       </div>
@@ -567,12 +578,13 @@ export default function App() {
   }
 
   // =========================================================
-  // RESULT
+  // RESULT SCREEN
   // =========================================================
 
   if (isQuizFinished) {
     return (
       <div style={pageStyle}>
+        <QuizToaster themeConfig={currentThemeConfig} />
         <ThemeSwitcher
           currentTheme={currentThemeId}
           onThemeChange={setCurrentThemeId}
@@ -593,43 +605,59 @@ export default function App() {
   }
 
   // =========================================================
-  // QUIZ
+  // QUIZ SCREEN
   // =========================================================
 
   if (questions.length > 0) {
-    const currentQuestion =
-      questions[currentIndex];
-
-    const selectedAnswer =
-      userAnswers[currentIndex] || null;
+    const currentQuestion = questions[currentIndex];
+    const selectedAnswer = userAnswers[currentIndex] || null;
 
     return (
       <div style={pageStyle}>
+        <QuizToaster themeConfig={currentThemeConfig} />
         <ThemeSwitcher
           currentTheme={currentThemeId}
           onThemeChange={setCurrentThemeId}
         />
 
-        <div
-          style={{
-            textAlign: 'center',
-            marginBottom: '4px',
-          }}
-        >
-          <motion.h2
+        {/* Player Greeting Badge */}
+        <div style={{ textAlign: 'center', marginTop: '8px' }}>
+          <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             style={{
-              margin: '10px 0 0',
-              fontFamily: "'Inter', system-ui, sans-serif",
-              color: '#ffffff',
-              fontSize: '20px',
-              fontWeight: 800,
-              letterSpacing: '-0.02em',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '8px 18px',
+              borderRadius: '999px',
+              background: '#FFFFFF',
+              border: '3px solid #000000',
+              boxShadow: '4px 4px 0px #000000',
+              fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
             }}
           >
-            Semangat, <span style={{ color: currentThemeConfig.accent }}>{playerName}</span>! 💪
-          </motion.h2>
+            <span style={{ fontSize: '15px' }}>💪</span>
+            <span
+              style={{
+                fontSize: '13px',
+                fontWeight: 800,
+                color: '#000000',
+              }}
+            >
+              Semangat bertanding,{' '}
+              <span
+                style={{
+                  color: currentThemeConfig.primary,
+                  fontWeight: 900,
+                  textDecoration: 'underline',
+                }}
+              >
+                {playerName}
+              </span>
+              !
+            </span>
+          </motion.div>
         </div>
 
         <QuizCard
@@ -649,4 +677,3 @@ export default function App() {
 
   return null;
 }
-

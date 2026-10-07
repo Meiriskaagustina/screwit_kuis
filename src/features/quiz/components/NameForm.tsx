@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
 
 import type {
   QuizCategory,
@@ -18,7 +19,6 @@ interface NameFormProps {
   themeConfig?: QuizThemeConfig;
 }
 
-
 const categoryOptions: {
   value: QuizCategory;
   label: string;
@@ -30,14 +30,14 @@ const categoryOptions: {
     value: 'general',
     label: 'General Knowledge',
     icon: '🧠',
-    description: 'Pengetahuan umum & wawasan luas',
+    description: 'Pengetahuan umum & wawasan dunia',
     difficulties: ['easy', 'medium'],
   },
   {
     value: 'animals',
     label: 'Animals',
     icon: '🐾',
-    description: 'Dunia hewan & fauna unik',
+    description: 'Dunia satwa & fauna unik',
     difficulties: ['medium'],
   },
 ];
@@ -58,574 +58,561 @@ const difficultyOptions: {
     value: 'medium',
     label: 'Medium',
     icon: '🔥',
-    description: 'Tantangan menengah',
+    description: 'Tantangan menengah seru',
   },
 ];
 
-export function NameForm({ onStartQuiz, themeConfig = QUIZ_THEMES.blue }: NameFormProps) {
+export function NameForm({
+  onStartQuiz,
+  themeConfig = QUIZ_THEMES.purple,
+}: NameFormProps) {
   const [name, setName] = useState('');
-
-  const [category, setCategory] =
-    useState<QuizCategory>('general');
-
-  const [difficulty, setDifficulty] =
-    useState<QuizDifficulty>('easy');
+  const [category, setCategory] = useState<QuizCategory>('general');
+  const [difficulty, setDifficulty] = useState<QuizDifficulty>('easy');
 
   const selectedCategory = categoryOptions.find(
     (item) => item.value === category,
   );
 
-  const availableDifficulties =
-    selectedCategory?.difficulties ?? [];
+  const availableDifficulties = selectedCategory?.difficulties ?? [];
 
-  const handleCategoryChange = (
-    newCategory: QuizCategory,
-  ) => {
+  const handleCategoryChange = (newCategory: QuizCategory) => {
     setCategory(newCategory);
 
-    const config = categoryOptions.find(
-      (item) => item.value === newCategory,
-    );
+    const config = categoryOptions.find((item) => item.value === newCategory);
 
-    if (
-      config &&
-      !config.difficulties.includes(difficulty)
-    ) {
+    if (config && !config.difficulties.includes(difficulty)) {
       setDifficulty(config.difficulties[0]);
     }
   };
 
-  const handleSubmit = (
-    e: FormEvent<HTMLFormElement>,
-  ) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!name.trim()) return;
+    if (!name.trim()) {
+      toast.error('Silakan isi nama kamu terlebih dahulu!', {
+        id: 'name-empty',
+        icon: '⚠️',
+      });
+      return;
+    }
 
-    onStartQuiz(
-      name.trim(),
-      category,
-      difficulty,
-    );
+    onStartQuiz(name.trim(), category, difficulty);
   };
 
   return (
     <div
       style={{
-        minHeight: '100vh',
-        boxSizing: 'border-box',
-        padding: '24px 18px 50px',
-
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-
-        fontFamily:
-          "'Inter', system-ui, -apple-system, sans-serif",
+        position: 'relative',
+        maxWidth: '560px',
+        width: '100%',
+        margin: '0 auto',
+        fontFamily: "'Plus Jakarta Sans', system-ui, -apple-system, sans-serif",
       }}
     >
-      <motion.div
-        initial={{
-          opacity: 0,
-          y: 25,
-          scale: 0.96,
-        }}
-        animate={{
-          opacity: 1,
-          y: 0,
-          scale: 1,
-        }}
-        transition={{
-          duration: 0.5,
-          ease: 'easeOut',
-        }}
+      {/* FLOATING DECORATIVE BADGES (DESKTOP) */}
+      <div
+        className="neo-desktop-decor"
         style={{
-          position: 'relative',
-          maxWidth: '520px',
-          width: '100%',
-          boxSizing: 'border-box',
-          padding: 'clamp(26px, 5vw, 38px)',
-          borderRadius: '30px',
-
-          background:
-            'linear-gradient(145deg, rgba(255,255,255,0.17), rgba(255,255,255,0.07))',
-
-          backdropFilter: 'blur(24px)',
-          WebkitBackdropFilter: 'blur(24px)',
-
-          border:
-            '1px solid rgba(255,255,255,0.20)',
-
-          boxShadow:
-            '0 30px 70px rgba(17,24,39,0.32), inset 0 1px 0 rgba(255,255,255,0.15)',
-
-          overflow: 'hidden',
+          position: 'absolute',
+          top: '-24px',
+          left: '-44px',
+          background: themeConfig.highlight,
+          color: '#000000',
+          border: '3px solid #000000',
+          boxShadow: '4px 4px 0px #000000',
+          padding: '6px 14px',
+          borderRadius: '8px',
+          fontSize: '11px',
+          fontWeight: 900,
+          transform: 'rotate(-7deg)',
+          zIndex: 5,
+          userSelect: 'none',
         }}
       >
-        {/* Decorative calm glow */}
+        ★ 100% SERU ★
+      </div>
 
+      <div
+        className="neo-desktop-decor"
+        style={{
+          position: 'absolute',
+          bottom: '18px',
+          right: '-46px',
+          background: themeConfig.accent,
+          color: '#FFFFFF',
+          border: '3px solid #000000',
+          boxShadow: '4px 4px 0px #000000',
+          padding: '6px 14px',
+          borderRadius: '8px',
+          fontSize: '11px',
+          fontWeight: 900,
+          transform: 'rotate(6deg)',
+          zIndex: 5,
+          userSelect: 'none',
+        }}
+      >
+        ⚡ TRIVIA TIME ⚡
+      </div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.35, ease: 'easeOut' }}
+        style={{
+          position: 'relative',
+          width: '100%',
+          boxSizing: 'border-box',
+          padding: 'clamp(24px, 5vw, 36px)',
+          borderRadius: '20px',
+          background: themeConfig.surface,
+          border: '4px solid #000000',
+          boxShadow: '10px 10px 0px #000000',
+        }}
+      >
+        {/* TOP BADGE STRIP */}
         <div
           style={{
-            position: 'absolute',
-            width: '200px',
-            height: '200px',
-            borderRadius: '50%',
-            top: '-100px',
-            right: '-90px',
-
-            background:
-              `radial-gradient(circle, ${themeConfig.glow1}, transparent 70%)`,
-
-            pointerEvents: 'none',
-          }}
-        />
-
-        <div
-          style={{
-            position: 'absolute',
-            width: '180px',
-            height: '180px',
-            borderRadius: '50%',
-            bottom: '-90px',
-            left: '-80px',
-
-            background:
-              `radial-gradient(circle, ${themeConfig.glow2}, transparent 70%)`,
-
-            pointerEvents: 'none',
-          }}
-        />
-
-        <div
-          style={{
-            position: 'relative',
-            zIndex: 2,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '18px',
+            gap: '8px',
+            flexWrap: 'wrap',
           }}
         >
-          {/* LOGO BADGE */}
-
-          <motion.div
-            initial={{
-              scale: 0,
-              rotate: -15,
-            }}
-            animate={{
-              scale: 1,
-              rotate: 0,
-            }}
-            transition={{
-              type: 'spring',
-              stiffness: 240,
-              damping: 18,
-              delay: 0.1,
-            }}
+          <span
             style={{
-              width: '72px',
-              height: '72px',
-              margin: '0 auto 20px',
-              borderRadius: '24px',
-
-              display: 'flex',
+              display: 'inline-flex',
               alignItems: 'center',
-              justifyContent: 'center',
-
-              background: themeConfig.gradient,
-
-              fontSize: '32px',
-
-              boxShadow:
-                `0 15px 35px ${themeConfig.glow1}, inset 0 1px 0 rgba(255,255,255,0.3)`,
+              gap: '6px',
+              padding: '6px 14px',
+              borderRadius: '999px',
+              background: themeConfig.highlight,
+              border: '2.5px solid #000000',
+              boxShadow: '3px 3px 0px #000000',
+              color: '#000000',
+              fontSize: '11px',
+              fontWeight: 900,
+              letterSpacing: '0.04em',
+              textTransform: 'uppercase',
             }}
           >
-            🎯
+            ★ OFFICIAL QUIZ APP ★
+          </span>
+
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
+              padding: '6px 12px',
+              borderRadius: '999px',
+              background: themeConfig.primary,
+              border: '2.5px solid #000000',
+              boxShadow: '3px 3px 0px #000000',
+              color: themeConfig.contrastText,
+              fontSize: '11px',
+              fontWeight: 900,
+            }}
+          >
+            🎮 10 SOAL TRIVIA
+          </span>
+        </div>
+
+        {/* LOGO FOCAL POINT */}
+        <div
+          style={{
+            textAlign: 'center',
+            marginBottom: '22px',
+          }}
+        >
+          <motion.div
+            whileHover={{ scale: 1.03, rotate: -1 }}
+            transition={{ type: 'spring', stiffness: 300 }}
+            style={{
+              display: 'inline-block',
+              padding: '12px 18px',
+              borderRadius: '16px',
+              background: '#FFFFFF',
+              border: '3.5px solid #000000',
+              boxShadow: '6px 6px 0px #000000',
+              marginBottom: '14px',
+            }}
+          >
+            <img
+              src="/images/screw-it-logo.png"
+              alt="Screw It Logo"
+              style={{
+                display: 'block',
+                maxHeight: '85px',
+                maxWidth: '220px',
+                width: 'auto',
+                height: 'auto',
+                objectFit: 'contain',
+                margin: '0 auto',
+              }}
+            />
           </motion.div>
 
-          {/* HEADING */}
-
-          <div
+          <h1
             style={{
-              textAlign: 'center',
-              marginBottom: '30px',
+              margin: '0 0 6px',
+              color: '#000000',
+              fontSize: 'clamp(26px, 6vw, 34px)',
+              fontWeight: 900,
+              letterSpacing: '-0.03em',
+              textTransform: 'uppercase',
+              lineHeight: 1.15,
             }}
           >
-            <div
+            ScrewIt Quiz
+          </h1>
+
+          <p
+            style={{
+              margin: 0,
+              color: '#374151',
+              fontSize: '14px',
+              fontWeight: 600,
+              lineHeight: 1.45,
+            }}
+          >
+            Tantang wawasanmu! Masukkan nama, pilih mode, dan mulai permainan! 🚀
+          </p>
+        </div>
+
+        {/* FORM */}
+        <form
+          onSubmit={handleSubmit}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '20px',
+          }}
+        >
+          {/* NAME INPUT */}
+          <div>
+            <label
+              htmlFor="player-name-input"
               style={{
-                fontSize: '11px',
-                fontWeight: 800,
-                letterSpacing: '0.14em',
-                color: themeConfig.accent,
-                marginBottom: '6px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                marginBottom: '8px',
+                color: '#000000',
+                fontSize: '12px',
+                fontWeight: 900,
+                letterSpacing: '0.06em',
                 textTransform: 'uppercase',
               }}
             >
-              Interactive Quiz Platform
-            </div>
+              <span>✏️</span> NAMA PEMAIN:
+            </label>
 
-            <h1
+            <input
+              id="player-name-input"
+              className="quiz-name-input"
+              type="text"
+              placeholder="Ketik nama kamu di sini..."
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               style={{
-                margin: 0,
-                color: '#ffffff',
-                fontSize: '28px',
-                fontWeight: 900,
-                letterSpacing: '-0.03em',
+                width: '100%',
+                boxSizing: 'border-box',
+                padding: '14px 16px',
+                borderRadius: '12px',
+                background: '#FFFFFF',
+                border: '3px solid #000000',
+                boxShadow: '4px 4px 0px #000000',
+                color: '#000000',
+                fontSize: '15px',
+                fontWeight: 800,
+                transition: 'all 0.15s ease',
               }}
-            >
-              ScrewIt Quiz
-            </h1>
-
-            <p
-              style={{
-                margin: '8px 0 0',
-                color: 'rgba(255,255,255,0.65)',
-                fontSize: '13.5px',
-                lineHeight: 1.5,
-              }}
-            >
-              Uji wawasanmu. Pilih kategori & tingkat kesulitan, lalu mulai tantangan! 🚀
-            </p>
+              required
+            />
           </div>
 
-          <form
-            onSubmit={handleSubmit}
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '22px',
-            }}
-          >
-            {/* NAME */}
-
-            <div>
-              <label
-                style={{
-                  display: 'block',
-                  marginBottom: '8px',
-                  color: themeConfig.accent,
-                  fontSize: '11px',
-                  fontWeight: 800,
-                  letterSpacing: '0.08em',
-                }}
-              >
-                NAMA PEMAIN
-              </label>
-
-              <motion.input
-                className="quiz-name-input"
-                type="text"
-                placeholder="Masukkan nama panggilanmu..."
-                value={name}
-                onChange={(e) =>
-                  setName(e.target.value)
-                }
-                whileFocus={{
-                  scale: 1.01,
-                }}
-                style={{
-                  width: '100%',
-                  boxSizing: 'border-box',
-                  padding: '14px 16px',
-                  borderRadius: '16px',
-
-                  background:
-                    'rgba(255,255,255,0.075)',
-
-                  border:
-                    '1px solid rgba(255,255,255,0.14)',
-
-                  color: '#ffffff',
-
-                  fontSize: '14px',
-                  fontWeight: 600,
-
-                  outline: 'none',
-
-                  transition: 'all 0.2s ease',
-                }}
-                required
-              />
-            </div>
-
-            {/* CATEGORY */}
-
-            <div>
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  marginBottom: '10px',
-                }}
-              >
-                <label
-                  style={{
-                    color: themeConfig.accent,
-                    fontSize: '11px',
-                    fontWeight: 800,
-                    letterSpacing: '0.08em',
-                  }}
-                >
-                  KATEGORI
-                </label>
-
-                <span
-                  style={{
-                    color: 'rgba(255,255,255,0.40)',
-                    fontSize: '10px',
-                    fontWeight: 600,
-                  }}
-                >
-                  Pilih topik
-                </span>
-              </div>
-
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns:
-                    'repeat(2, minmax(0, 1fr))',
-                  gap: '12px',
-                }}
-              >
-                {categoryOptions.map((item) => {
-                  const isSelected =
-                    category === item.value;
-
-                  return (
-                    <motion.button
-                      key={item.value}
-                      type="button"
-                      whileHover={{ y: -2 }}
-                      whileTap={{ scale: 0.97 }}
-                      onClick={() =>
-                        handleCategoryChange(
-                          item.value,
-                        )
-                      }
-                      style={{
-                        padding: '16px 14px',
-                        borderRadius: '18px',
-
-                        border: isSelected
-                          ? `1.5px solid ${themeConfig.selectedBorder}`
-                          : '1px solid rgba(255,255,255,0.14)',
-
-                        background: isSelected
-                          ? themeConfig.selectedBg
-                          : 'rgba(255,255,255,0.075)',
-
-                        color: '#ffffff',
-                        cursor: 'pointer',
-                        textAlign: 'left',
-
-                        boxShadow: isSelected
-                          ? themeConfig.selectedShadow
-                          : 'none',
-
-                        transition: 'border 0.2s ease, background 0.2s ease',
-                      }}
-                    >
-                      <div
-                        style={{
-                          fontSize: '24px',
-                          marginBottom: '8px',
-                        }}
-                      >
-                        {item.icon}
-                      </div>
-
-                      <div
-                        style={{
-                          fontSize: '13px',
-                          fontWeight: 800,
-                          marginBottom: '4px',
-                          color: isSelected ? '#ffffff' : 'rgba(255,255,255,0.9)',
-                        }}
-                      >
-                        {item.label}
-                      </div>
-
-                      <div
-                        style={{
-                          fontSize: '10px',
-                          lineHeight: 1.4,
-                          color: isSelected
-                            ? 'rgba(255,255,255,0.75)'
-                            : 'rgba(255,255,255,0.45)',
-                        }}
-                      >
-                        {item.description}
-                      </div>
-                    </motion.button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* DIFFICULTY */}
-
-            <div>
-              <label
-                style={{
-                  display: 'block',
-                  marginBottom: '10px',
-                  color: themeConfig.accent,
-                  fontSize: '11px',
-                  fontWeight: 800,
-                  letterSpacing: '0.08em',
-                }}
-              >
-                TINGKAT KESULITAN
-              </label>
-
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns:
-                    'repeat(2, minmax(0, 1fr))',
-                  gap: '12px',
-                }}
-              >
-                {difficultyOptions.map((item) => {
-                  const isAvailable =
-                    availableDifficulties.includes(
-                      item.value,
-                    );
-
-                  const isSelected =
-                    difficulty === item.value;
-
-                  return (
-                    <motion.button
-                      key={item.value}
-                      type="button"
-                      disabled={!isAvailable}
-                      whileHover={
-                        isAvailable
-                          ? { y: -2 }
-                          : {}
-                      }
-                      whileTap={
-                        isAvailable
-                          ? { scale: 0.97 }
-                          : {}
-                      }
-                      onClick={() => {
-                        if (isAvailable) {
-                          setDifficulty(
-                            item.value,
-                          );
-                        }
-                      }}
-                      style={{
-                        padding: '14px',
-                        borderRadius: '16px',
-
-                        border: isSelected
-                          ? `1.5px solid ${themeConfig.selectedBorder}`
-                          : '1px solid rgba(255,255,255,0.14)',
-
-                        background: isSelected
-                          ? themeConfig.selectedBg
-                          : 'rgba(255,255,255,0.075)',
-
-                        color: isAvailable
-                          ? '#ffffff'
-                          : 'rgba(255,255,255,0.22)',
-
-                        cursor: isAvailable
-                          ? 'pointer'
-                          : 'not-allowed',
-
-                        opacity: isAvailable
-                          ? 1
-                          : 0.45,
-
-                        textAlign: 'left',
-
-                        boxShadow: isSelected
-                          ? themeConfig.selectedShadow
-                          : 'none',
-                      }}
-                    >
-                      <div
-                        style={{
-                          fontSize: '20px',
-                          marginBottom: '6px',
-                        }}
-                      >
-                        {item.icon}
-                      </div>
-
-                      <div
-                        style={{
-                          fontSize: '12px',
-                          fontWeight: 800,
-                        }}
-                      >
-                        {item.label}
-                      </div>
-
-                      <div
-                        style={{
-                          fontSize: '10px',
-                          marginTop: '3px',
-                          color: isAvailable
-                            ? 'rgba(255,255,255,0.5)'
-                            : 'rgba(255,255,255,0.22)',
-                        }}
-                      >
-                        {isAvailable
-                          ? item.description
-                          : 'Tidak tersedia'}
-                      </div>
-                    </motion.button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* START BUTTON */}
-
-            <motion.button
-              type="submit"
-              whileHover={{
-                scale: 1.02,
-                y: -2,
-                boxShadow:
-                  `0 15px 35px ${themeConfig.glow1}`,
-              }}
-              whileTap={{
-                scale: 0.97,
-              }}
+          {/* CATEGORY SELECTOR */}
+          <div>
+            <div
               style={{
-                marginTop: '6px',
-                padding: '16px',
-                border: 'none',
-                borderRadius: '16px',
-
-                background: themeConfig.gradient,
-
-                color: '#ffffff',
-
-                fontSize: '15px',
-                fontWeight: 900,
-
-                cursor: 'pointer',
-
-                boxShadow:
-                  `0 10px 25px ${themeConfig.glow1}`,
-
-                transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '8px',
               }}
             >
-              🚀 Mulai Permainan
-            </motion.button>
-          </form>
-        </div>
+              <label
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  color: '#000000',
+                  fontSize: '12px',
+                  fontWeight: 900,
+                  letterSpacing: '0.06em',
+                  textTransform: 'uppercase',
+                }}
+              >
+                <span>📚</span> PILIH KATEGORI:
+              </label>
+              <span
+                style={{
+                  fontSize: '11px',
+                  fontWeight: 800,
+                  color: '#4B5563',
+                }}
+              >
+                2 Pilihan
+              </span>
+            </div>
+
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+                gap: '10px',
+              }}
+            >
+              {categoryOptions.map((item) => {
+                const isSelected = category === item.value;
+
+                return (
+                  <motion.button
+                    key={item.value}
+                    type="button"
+                    whileHover={{ y: -2 }}
+                    whileTap={{ y: 2 }}
+                    onClick={() => handleCategoryChange(item.value)}
+                    style={{
+                      padding: '14px 12px',
+                      borderRadius: '14px',
+                      border: '3px solid #000000',
+                      background: isSelected ? themeConfig.primary : '#FFFFFF',
+                      color: isSelected ? themeConfig.contrastText : '#000000',
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                      boxShadow: isSelected
+                        ? '5px 5px 0px #000000'
+                        : '3px 3px 0px #000000',
+                      transform: isSelected
+                        ? 'translate(-2px, -2px)'
+                        : 'translate(0px, 0px)',
+                      transition:
+                        'background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease',
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginBottom: '6px',
+                      }}
+                    >
+                      <span style={{ fontSize: '24px' }}>{item.icon}</span>
+                      {isSelected && (
+                        <span
+                          style={{
+                            background: themeConfig.highlight,
+                            color: '#000000',
+                            border: '1.5px solid #000000',
+                            fontSize: '10px',
+                            fontWeight: 900,
+                            padding: '2px 6px',
+                            borderRadius: '6px',
+                          }}
+                        >
+                          ✓ AKTIF
+                        </span>
+                      )}
+                    </div>
+
+                    <div
+                      style={{
+                        fontSize: '13px',
+                        fontWeight: 900,
+                        lineHeight: 1.25,
+                        marginBottom: '4px',
+                      }}
+                    >
+                      {item.label}
+                    </div>
+
+                    <div
+                      style={{
+                        fontSize: '11px',
+                        fontWeight: 600,
+                        lineHeight: 1.35,
+                        color: isSelected
+                          ? themeConfig.contrastText === '#FFFFFF'
+                            ? '#FEF08A'
+                            : '#374151'
+                          : '#4B5563',
+                      }}
+                    >
+                      {item.description}
+                    </div>
+                  </motion.button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* DIFFICULTY SELECTOR */}
+          <div>
+            <label
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                marginBottom: '8px',
+                color: '#000000',
+                fontSize: '12px',
+                fontWeight: 900,
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
+              }}
+            >
+              <span>⚡</span> TINGKAT KESULITAN:
+            </label>
+
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+                gap: '10px',
+              }}
+            >
+              {difficultyOptions.map((item) => {
+                const isAvailable = availableDifficulties.includes(item.value);
+                const isSelected = difficulty === item.value;
+
+                return (
+                  <motion.button
+                    key={item.value}
+                    type="button"
+                    disabled={!isAvailable}
+                    whileHover={isAvailable ? { y: -2 } : {}}
+                    whileTap={isAvailable ? { y: 2 } : {}}
+                    onClick={() => {
+                      if (isAvailable) {
+                        setDifficulty(item.value);
+                      }
+                    }}
+                    style={{
+                      padding: '12px 14px',
+                      borderRadius: '14px',
+                      border: '3px solid #000000',
+                      background: !isAvailable
+                        ? '#E5E7EB'
+                        : isSelected
+                          ? themeConfig.primary
+                          : '#FFFFFF',
+                      color: !isAvailable
+                        ? '#9CA3AF'
+                        : isSelected
+                          ? themeConfig.contrastText
+                          : '#000000',
+                      cursor: isAvailable ? 'pointer' : 'not-allowed',
+                      textAlign: 'left',
+                      boxShadow: isSelected
+                        ? '5px 5px 0px #000000'
+                        : isAvailable
+                          ? '3px 3px 0px #000000'
+                          : 'none',
+                      transform: isSelected
+                        ? 'translate(-2px, -2px)'
+                        : 'translate(0px, 0px)',
+                      opacity: isAvailable ? 1 : 0.5,
+                      transition:
+                        'background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease',
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        marginBottom: '4px',
+                      }}
+                    >
+                      <span style={{ fontSize: '20px' }}>{item.icon}</span>
+                      {isSelected && (
+                        <span
+                          style={{
+                            background: themeConfig.highlight,
+                            color: '#000000',
+                            border: '1.5px solid #000000',
+                            fontSize: '9px',
+                            fontWeight: 900,
+                            padding: '2px 6px',
+                            borderRadius: '4px',
+                          }}
+                        >
+                          PILIHAN
+                        </span>
+                      )}
+                    </div>
+
+                    <div
+                      style={{
+                        fontSize: '13px',
+                        fontWeight: 900,
+                      }}
+                    >
+                      {item.label}
+                    </div>
+
+                    <div
+                      style={{
+                        fontSize: '10px',
+                        fontWeight: 600,
+                        color: !isAvailable
+                          ? '#9CA3AF'
+                          : isSelected
+                            ? themeConfig.contrastText === '#FFFFFF'
+                              ? '#FEF08A'
+                              : '#374151'
+                            : '#4B5563',
+                      }}
+                    >
+                      {isAvailable ? item.description : 'Tidak tersedia'}
+                    </div>
+                  </motion.button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* SUBMIT BUTTON (THEME-AWARE PRIMARY COLOR) */}
+          <motion.button
+            type="submit"
+            whileHover={{ y: -3, boxShadow: '8px 8px 0px #000000' }}
+            whileTap={{ y: 2, boxShadow: '2px 2px 0px #000000' }}
+            style={{
+              marginTop: '8px',
+              padding: '16px 20px',
+              borderRadius: '14px',
+              border: '3.5px solid #000000',
+              background: themeConfig.primary,
+              color: themeConfig.contrastText,
+              fontSize: '16px',
+              fontWeight: 900,
+              letterSpacing: '0.04em',
+              textTransform: 'uppercase',
+              cursor: 'pointer',
+              boxShadow: '6px 6px 0px #000000',
+              transition:
+                'transform 0.1s ease, box-shadow 0.1s ease, background 0.2s ease',
+            }}
+          >
+            🚀 MULAI PERMAINAN SEKARANG
+          </motion.button>
+        </form>
       </motion.div>
     </div>
   );
 }
-
-
-
